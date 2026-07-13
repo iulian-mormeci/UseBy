@@ -35,13 +35,32 @@ enum MissingProductReportStatus {
   REJECTED
 }
 
+enum PendingProductSubmissionStatus {
+  PENDING
+  EMAILED
+  INCLUDED
+  REJECTED
+}
+
 model Location {
   id         Int          @id @default(autoincrement())
   name       String       @unique
   type       LocationType
+  zones      Zone[]
   stockItems StockItem[]
   createdAt  DateTime     @default(now())
   updatedAt  DateTime     @updatedAt
+}
+
+model Zone {
+  id         Int         @id @default(autoincrement())
+  locationId Int
+  location   Location    @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  name       String
+  stockItems StockItem[]
+  createdAt  DateTime    @default(now())
+
+  @@unique([locationId, name])
 }
 
 model Category {
@@ -51,18 +70,21 @@ model Category {
 }
 
 model Product {
-  id                   Int                    @id @default(autoincrement())
+  id                   Int                        @id @default(autoincrement())
   name                 String
-  barcode              String?                @unique
-  unit                 UnitOfMeasure          @default(PIECE)
+  brand                String?
+  barcode              String?                    @unique
+  imageUrl             String?
+  unit                 UnitOfMeasure              @default(PIECE)
   defaultShelfLifeDays Int?
   categoryId           Int?
-  category             Category?              @relation(fields: [categoryId], references: [id])
+  category             Category?                  @relation(fields: [categoryId], references: [id])
   stockItems           StockItem[]
   recipeIngredients    RecipeIngredient[]
   missingReports       MissingProductReport[]
-  createdAt            DateTime               @default(now())
-  updatedAt            DateTime               @updatedAt
+  pendingSubmissions   PendingProductSubmission[]
+  createdAt            DateTime                   @default(now())
+  updatedAt            DateTime                   @updatedAt
 
   @@index([name])
 }
@@ -73,9 +95,12 @@ model StockItem {
   product     Product    @relation(fields: [productId], references: [id], onDelete: Restrict)
   locationId  Int
   location    Location   @relation(fields: [locationId], references: [id])
+  zoneId      Int?
+  zone        Zone?      @relation(fields: [zoneId], references: [id], onDelete: SetNull)
   quantity    Decimal    @default(1)
   expiryDate  DateTime?
   expiryType  ExpiryType @default(USE_BY)
+  leadDays    Int?
   purchasedAt DateTime?
   openedAt    DateTime?
   notes       String?
@@ -84,6 +109,7 @@ model StockItem {
 
   @@index([productId])
   @@index([locationId])
+  @@index([zoneId])
   @@index([expiryDate])
 }
 
@@ -126,4 +152,24 @@ model MissingProductReport {
   updatedAt         DateTime                   @updatedAt
 
   @@index([status])
+}
+
+model PendingProductSubmission {
+  id        Int                            @id @default(autoincrement())
+  barcode   String
+  productId Int
+  product   Product                        @relation(fields: [productId], references: [id], onDelete: Cascade)
+  status    PendingProductSubmissionStatus @default(PENDING)
+  emailedAt DateTime?
+  createdAt DateTime                       @default(now())
+  updatedAt DateTime                       @updatedAt
+
+  @@index([barcode])
+  @@index([status])
+}
+
+model NotificationSetting {
+  id              Int      @id @default(1)
+  defaultLeadDays Int      @default(3)
+  updatedAt       DateTime @updatedAt
 }
