@@ -37,12 +37,20 @@ export default async function DispensaPage({
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">Dispensa</h1>
-        <Link
-          href="/dispensa/nuovo"
-          className="rounded-md bg-gray-900 px-3 py-1.5 text-sm font-medium text-white dark:bg-gray-100 dark:text-gray-900"
-        >
-          + Aggiungi prodotto
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/dispensa/scansiona"
+            className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium dark:border-gray-700"
+          >
+            Scansiona codice a barre
+          </Link>
+          <Link
+            href="/dispensa/nuovo"
+            className="rounded-md bg-gray-900 px-3 py-1.5 text-sm font-medium text-white dark:bg-gray-100 dark:text-gray-900"
+          >
+            + Aggiungi prodotto
+          </Link>
+        </div>
       </div>
 
       <form method="get" className="flex flex-wrap items-end gap-3">

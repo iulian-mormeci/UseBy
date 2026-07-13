@@ -1,10 +1,18 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { StockItemForm } from "@/components/forms/StockItemForm";
+import { parseId } from "@/lib/parse-id";
 
 export const dynamic = "force-dynamic";
 
-export default async function NuovoStockItemPage() {
+export default async function NuovoStockItemPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ productId?: string }>;
+}) {
+  const { productId } = await searchParams;
+  const defaultProductId = productId ? (parseId(productId) ?? undefined) : undefined;
+
   const [products, locations] = await Promise.all([
     prisma.product.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
     prisma.location.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
@@ -18,6 +26,10 @@ export default async function NuovoStockItemPage() {
           Non trovi il prodotto?{" "}
           <Link href="/prodotti/nuovo" className="text-blue-600 hover:underline dark:text-blue-400">
             Aggiungilo al catalogo
+          </Link>{" "}
+          o{" "}
+          <Link href="/dispensa/scansiona" className="text-blue-600 hover:underline dark:text-blue-400">
+            scansiona il codice a barre
           </Link>
           .
         </p>
@@ -29,7 +41,7 @@ export default async function NuovoStockItemPage() {
           dispensa.
         </p>
       ) : (
-        <StockItemForm products={products} locations={locations} />
+        <StockItemForm products={products} locations={locations} defaultProductId={defaultProductId} />
       )}
     </div>
   );

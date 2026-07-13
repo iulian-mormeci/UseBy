@@ -28,7 +28,10 @@ export default async function ModificaProdottoPage({
         productId={product.id}
         initialData={{
           name: product.name,
+          brand: product.brand,
           barcode: product.barcode,
+          imageUrl: product.imageUrl,
+          storageHint: product.storageHint,
           unit: product.unit,
           defaultShelfLifeDays: product.defaultShelfLifeDays,
           categoryId: product.categoryId,

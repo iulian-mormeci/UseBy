@@ -27,11 +27,13 @@ export function StockItemForm({
   locations,
   stockItemId,
   initialData,
+  defaultProductId,
 }: {
   products: Option[];
   locations: Option[];
   stockItemId?: number;
   initialData?: InitialData;
+  defaultProductId?: number;
 }) {
   const router = useRouter();
   const [formError, setFormError] = useState<string | null>(null);
@@ -80,7 +82,7 @@ export function StockItemForm({
         <select
           name="productId"
           required
-          defaultValue={initialData?.productId ?? ""}
+          defaultValue={initialData?.productId ?? defaultProductId ?? ""}
           className="rounded-md border border-gray-300 px-3 py-2 dark:border-gray-700 dark:bg-gray-900"
         >
           <option value="" disabled>

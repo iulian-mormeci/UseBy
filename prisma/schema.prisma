@@ -75,6 +75,7 @@ model Product {
   brand                String?
   barcode              String?                    @unique
   imageUrl             String?
+  storageHint          String?
   unit                 UnitOfMeasure              @default(PIECE)
   defaultShelfLifeDays Int?
   categoryId           Int?
