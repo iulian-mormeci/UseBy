@@ -1,8 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
@@ -10,4 +8,122 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+enum LocationType {
+  PANTRY
+  FRIDGE
+  FREEZER
+}
+
+enum UnitOfMeasure {
+  PIECE
+  GRAM
+  KILOGRAM
+  MILLILITER
+  LITER
+}
+
+enum ExpiryType {
+  USE_BY
+  BEST_BEFORE
+}
+
+enum MissingProductReportStatus {
+  PENDING
+  RESOLVED
+  REJECTED
+}
+
+model Location {
+  id         Int          @id @default(autoincrement())
+  name       String       @unique
+  type       LocationType
+  stockItems StockItem[]
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+}
+
+model Category {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  products Product[]
+}
+
+model Product {
+  id                   Int                    @id @default(autoincrement())
+  name                 String
+  barcode              String?                @unique
+  unit                 UnitOfMeasure          @default(PIECE)
+  defaultShelfLifeDays Int?
+  categoryId           Int?
+  category             Category?              @relation(fields: [categoryId], references: [id])
+  stockItems           StockItem[]
+  recipeIngredients    RecipeIngredient[]
+  missingReports       MissingProductReport[]
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+
+  @@index([name])
+}
+
+model StockItem {
+  id          Int        @id @default(autoincrement())
+  productId   Int
+  product     Product    @relation(fields: [productId], references: [id], onDelete: Restrict)
+  locationId  Int
+  location    Location   @relation(fields: [locationId], references: [id])
+  quantity    Decimal    @default(1)
+  expiryDate  DateTime?
+  expiryType  ExpiryType @default(USE_BY)
+  purchasedAt DateTime?
+  openedAt    DateTime?
+  notes       String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([productId])
+  @@index([locationId])
+  @@index([expiryDate])
+}
+
+model Recipe {
+  id           Int                @id @default(autoincrement())
+  title        String
+  instructions String
+  servings     Int?
+  prepMinutes  Int?
+  cookMinutes  Int?
+  notes        String?
+  ingredients  RecipeIngredient[]
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  @@index([title])
+}
+
+model RecipeIngredient {
+  id        Int      @id @default(autoincrement())
+  recipeId  Int
+  recipe    Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Restrict)
+  quantity  Decimal?
+  optional  Boolean  @default(false)
+
+  @@unique([recipeId, productId])
+}
+
+model MissingProductReport {
+  id                Int                        @id @default(autoincrement())
+  requestedName     String
+  note              String?
+  status            MissingProductReportStatus @default(PENDING)
+  resolvedProductId Int?
+  resolvedProduct   Product?                   @relation(fields: [resolvedProductId], references: [id])
+  emailedAt         DateTime?
+  createdAt         DateTime                   @default(now())
+  updatedAt         DateTime                   @updatedAt
+
+  @@index([status])
 }
