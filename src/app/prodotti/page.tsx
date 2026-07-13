@@ -35,6 +35,14 @@ export default async function ProdottiPage({
         </Link>
       </div>
 
+      <p className="text-sm text-gray-500 dark:text-gray-400">
+        Non trovi un prodotto?{" "}
+        <Link href="/segnalazioni/nuova" className="text-blue-600 hover:underline dark:text-blue-400">
+          Segnalalo
+        </Link>
+        .
+      </p>
+
       <form method="get" className="flex flex-wrap items-end gap-3">
         <label className="flex flex-col gap-1">
           <span className="text-sm font-medium">Cerca</span>

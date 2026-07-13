@@ -53,6 +53,11 @@ prima di partire (vedi `docker-entrypoint.sh`).
 ## Variabili d'ambiente
 
 Vedi `.env.example` per l'elenco completo (credenziali Postgres, `DATABASE_URL`,
-porta dell'app, configurazione SMTP per le email di segnalazione prodotti mancanti).
+porta dell'app, configurazione SMTP per le email di segnalazione prodotti mancanti,
+`REPORT_EMAIL_TO` come destinatario di quelle email).
 In produzione, valorizzare `SMTP_HOST`/`SMTP_PORT`/`SMTP_USER`/`SMTP_PASSWORD` con
 un relay SMTP reale e omettere il profilo `dev` (Mailhog) in fase di avvio.
+
+`SMTP_HOST` dipende da come stai eseguendo l'app: `localhost` per `npm run dev`
+sull'host (Mailhog pubblica la porta 1025), `mailhog` se usi il profilo `dev` di
+docker-compose (rete interna dei container), il relay reale in produzione.

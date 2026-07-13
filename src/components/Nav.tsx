@@ -10,6 +10,7 @@ const LINKS = [
   { href: "/prodotti", label: "Prodotti" },
   { href: "/categorie", label: "Categorie" },
   { href: "/ubicazioni", label: "Ubicazioni" },
+  { href: "/segnalazioni", label: "Segnalazioni" },
 ];
 
 export function Nav() {
