@@ -12,7 +12,7 @@ export async function GET(_request: NextRequest, { params }: Params) {
 
   const stockItem = await prisma.stockItem.findUnique({
     where: { id },
-    include: { product: true, location: true },
+    include: { product: true, location: true, zone: true },
   });
   if (!stockItem) return jsonError("Prodotto in dispensa non trovato", 404);
 
@@ -28,7 +28,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     const stockItem = await prisma.stockItem.update({
       where: { id },
       data,
-      include: { product: true, location: true },
+      include: { product: true, location: true, zone: true },
     });
     return NextResponse.json(stockItem);
   } catch (error) {

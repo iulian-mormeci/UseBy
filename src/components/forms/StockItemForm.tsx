@@ -5,13 +5,16 @@ import { useState, type FormEvent } from "react";
 import { submitJson, type FieldErrors } from "@/lib/api-client";
 
 type Option = { id: number; name: string };
+type ZoneOption = { id: number; name: string; locationId: number };
 
 type InitialData = {
   productId: number;
   locationId: number;
+  zoneId: number | null;
   quantity: string;
   expiryDate: string | null;
   expiryType: "USE_BY" | "BEST_BEFORE";
+  leadDays: number | null;
   purchasedAt: string | null;
   openedAt: string | null;
   notes: string | null;
@@ -25,12 +28,14 @@ function toDateInputValue(value: string | null): string {
 export function StockItemForm({
   products,
   locations,
+  zones,
   stockItemId,
   initialData,
   defaultProductId,
 }: {
   products: Option[];
   locations: Option[];
+  zones: ZoneOption[];
   stockItemId?: number;
   initialData?: InitialData;
   defaultProductId?: number;
@@ -39,6 +44,11 @@ export function StockItemForm({
   const [formError, setFormError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [submitting, setSubmitting] = useState(false);
+  const [locationId, setLocationId] = useState<string>(
+    initialData?.locationId ? String(initialData.locationId) : "",
+  );
+
+  const zonesForLocation = zones.filter((zone) => String(zone.locationId) === locationId);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -47,12 +57,17 @@ export function StockItemForm({
     setFieldErrors({});
 
     const form = new FormData(event.currentTarget);
+    const zoneIdRaw = form.get("zoneId");
+    const leadDaysRaw = form.get("leadDays");
+
     const payload = {
       productId: Number(form.get("productId")),
       locationId: Number(form.get("locationId")),
+      zoneId: zoneIdRaw ? Number(zoneIdRaw) : null,
       quantity: form.get("quantity"),
       expiryDate: form.get("expiryDate") || null,
       expiryType: form.get("expiryType"),
+      leadDays: leadDaysRaw ? Number(leadDaysRaw) : null,
       purchasedAt: form.get("purchasedAt") || null,
       openedAt: form.get("openedAt") || null,
       notes: form.get("notes") || null,
@@ -99,27 +114,49 @@ export function StockItemForm({
         )}
       </label>
 
-      <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Ubicazione</span>
-        <select
-          name="locationId"
-          required
-          defaultValue={initialData?.locationId ?? ""}
-          className="rounded-md border border-gray-300 px-3 py-2 dark:border-gray-700 dark:bg-gray-900"
-        >
-          <option value="" disabled>
-            Seleziona un&apos;ubicazione
-          </option>
-          {locations.map((location) => (
-            <option key={location.id} value={location.id}>
-              {location.name}
+      <div className="flex gap-4">
+        <label className="flex flex-1 flex-col gap-1">
+          <span className="text-sm font-medium">Ubicazione</span>
+          <select
+            name="locationId"
+            required
+            value={locationId}
+            onChange={(event) => setLocationId(event.target.value)}
+            className="rounded-md border border-gray-300 px-3 py-2 dark:border-gray-700 dark:bg-gray-900"
+          >
+            <option value="" disabled>
+              Seleziona un&apos;ubicazione
             </option>
-          ))}
-        </select>
-        {fieldErrors.locationId && (
-          <span className="text-xs text-red-600 dark:text-red-400">{fieldErrors.locationId[0]}</span>
-        )}
-      </label>
+            {locations.map((location) => (
+              <option key={location.id} value={location.id}>
+                {location.name}
+              </option>
+            ))}
+          </select>
+          {fieldErrors.locationId && (
+            <span className="text-xs text-red-600 dark:text-red-400">
+              {fieldErrors.locationId[0]}
+            </span>
+          )}
+        </label>
+
+        <label className="flex flex-1 flex-col gap-1">
+          <span className="text-sm font-medium">Zona (opzionale)</span>
+          <select
+            name="zoneId"
+            defaultValue={initialData?.zoneId ?? ""}
+            disabled={zonesForLocation.length === 0}
+            className="rounded-md border border-gray-300 px-3 py-2 disabled:opacity-50 dark:border-gray-700 dark:bg-gray-900"
+          >
+            <option value="">Nessuna zona</option>
+            {zonesForLocation.map((zone) => (
+              <option key={zone.id} value={zone.id}>
+                {zone.name}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
 
       <label className="flex flex-col gap-1">
         <span className="text-sm font-medium">Quantità</span>
@@ -160,6 +197,18 @@ export function StockItemForm({
           </select>
         </label>
       </div>
+
+      <label className="flex flex-col gap-1">
+        <span className="text-sm font-medium">Preavviso personalizzato (giorni, opzionale)</span>
+        <input
+          type="number"
+          name="leadDays"
+          min="0"
+          defaultValue={initialData?.leadDays ?? ""}
+          placeholder="Usa il default globale"
+          className="rounded-md border border-gray-300 px-3 py-2 dark:border-gray-700 dark:bg-gray-900"
+        />
+      </label>
 
       <div className="flex gap-4">
         <label className="flex flex-1 flex-col gap-1">

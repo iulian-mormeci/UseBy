@@ -1,14 +1,9 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { DeleteButton } from "@/components/DeleteButton";
+import { LOCATION_TYPE_LABELS } from "@/lib/location-labels";
 
 export const dynamic = "force-dynamic";
-
-const TYPE_LABELS: Record<string, string> = {
-  PANTRY: "Dispensa",
-  FRIDGE: "Frigo",
-  FREEZER: "Congelatore",
-};
 
 export default async function UbicazioniPage() {
   const locations = await prisma.location.findMany({
@@ -45,7 +40,7 @@ export default async function UbicazioniPage() {
               {locations.map((location) => (
                 <tr key={location.id}>
                   <td className="px-3 py-2 font-medium">{location.name}</td>
-                  <td className="px-3 py-2">{TYPE_LABELS[location.type]}</td>
+                  <td className="px-3 py-2">{LOCATION_TYPE_LABELS[location.type]}</td>
                   <td className="px-3 py-2">{location._count.stockItems}</td>
                   <td className="px-3 py-2">
                     <div className="flex items-center gap-3">

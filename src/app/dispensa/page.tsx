@@ -2,11 +2,10 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { ExpiryBadge } from "@/components/ExpiryBadge";
 import { DeleteButton } from "@/components/DeleteButton";
+import { isExpired, isExpiringSoon } from "@/lib/expiry";
 import type { Prisma } from "@/generated/prisma/client";
 
 export const dynamic = "force-dynamic";
-
-const SOON_DAYS = 7;
 
 export default async function DispensaPage({
   searchParams,
@@ -15,23 +14,27 @@ export default async function DispensaPage({
 }) {
   const { locationId, stato } = await searchParams;
 
-  const now = new Date();
-  const soonThreshold = new Date(now.getTime() + SOON_DAYS * 24 * 3600 * 1000);
-
   const where: Prisma.StockItemWhereInput = {
     ...(locationId ? { locationId: Number(locationId) } : {}),
-    ...(stato === "scaduti" ? { expiryDate: { lt: now } } : {}),
-    ...(stato === "in-scadenza" ? { expiryDate: { gte: now, lte: soonThreshold } } : {}),
   };
 
-  const [stockItems, locations] = await Promise.all([
+  const [allMatchingItems, locations, notificationSetting] = await Promise.all([
     prisma.stockItem.findMany({
       where,
       orderBy: [{ expiryDate: { sort: "asc", nulls: "last" } }, { createdAt: "desc" }],
-      include: { product: true, location: true },
+      include: { product: true, location: true, zone: true },
     }),
     prisma.location.findMany({ orderBy: { name: "asc" } }),
+    prisma.notificationSetting.upsert({ where: { id: 1 }, update: {}, create: { id: 1 } }),
   ]);
+
+  const stockItems = allMatchingItems.filter((item) => {
+    if (stato === "scaduti") return isExpired(item.expiryDate);
+    if (stato === "in-scadenza") {
+      return isExpiringSoon(item.expiryDate, item.leadDays, notificationSetting.defaultLeadDays);
+    }
+    return true;
+  });
 
   return (
     <div className="flex flex-col gap-6">
@@ -103,6 +106,7 @@ export default async function DispensaPage({
               <tr>
                 <th className="px-3 py-2 font-medium">Prodotto</th>
                 <th className="px-3 py-2 font-medium">Ubicazione</th>
+                <th className="px-3 py-2 font-medium">Zona</th>
                 <th className="px-3 py-2 font-medium">Quantità</th>
                 <th className="px-3 py-2 font-medium">Scadenza</th>
                 <th className="px-3 py-2 font-medium">Azioni</th>
@@ -113,6 +117,9 @@ export default async function DispensaPage({
                 <tr key={item.id}>
                   <td className="px-3 py-2 font-medium">{item.product.name}</td>
                   <td className="px-3 py-2">{item.location.name}</td>
+                  <td className="px-3 py-2 text-gray-500 dark:text-gray-400">
+                    {item.zone?.name ?? "—"}
+                  </td>
                   <td className="px-3 py-2">
                     {String(item.quantity)} {item.product.unit.toLowerCase()}
                   </td>

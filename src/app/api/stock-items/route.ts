@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
         : {}),
     },
     orderBy: [{ expiryDate: { sort: "asc", nulls: "last" } }, { createdAt: "desc" }],
-    include: { product: { include: { category: true } }, location: true },
+    include: { product: { include: { category: true } }, location: true, zone: true },
   });
   return NextResponse.json(stockItems);
 }
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     const data = createStockItemSchema.parse(await request.json());
     const stockItem = await prisma.stockItem.create({
       data,
-      include: { product: true, location: true },
+      include: { product: true, location: true, zone: true },
     });
     return NextResponse.json(stockItem, { status: 201 });
   } catch (error) {
