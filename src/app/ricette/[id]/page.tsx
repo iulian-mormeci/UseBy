@@ -2,7 +2,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { parseId } from "@/lib/parse-id";
-import { getStockQuantityByProduct, computeCookability } from "@/lib/recipe-matching";
+import {
+  getStockQuantityByProduct,
+  getEarliestExpiryByProduct,
+  computeCookability,
+} from "@/lib/recipe-matching";
 import { DeleteButton } from "@/components/DeleteButton";
 
 export const dynamic = "force-dynamic";
@@ -15,17 +19,18 @@ export default async function RicettaDetailPage({
   const id = parseId((await params).id);
   if (id === null) notFound();
 
-  const [recipe, stockByProduct] = await Promise.all([
+  const [recipe, stockByProduct, expiryByProduct] = await Promise.all([
     prisma.recipe.findUnique({
       where: { id },
       include: { ingredients: { include: { product: true } } },
     }),
     getStockQuantityByProduct(),
+    getEarliestExpiryByProduct(),
   ]);
 
   if (!recipe) notFound();
 
-  const cookability = computeCookability(recipe, stockByProduct);
+  const cookability = computeCookability(recipe, stockByProduct, expiryByProduct);
 
   return (
     <div className="flex max-w-2xl flex-col gap-6">
@@ -63,6 +68,14 @@ export default async function RicettaDetailPage({
             ? "Manca 1 ingrediente"
             : `Mancano ${cookability.missingCount} ingredienti`}
         </span>
+      )}
+
+      {cookability.soonestExpiryDate && (
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          Usa ingredienti in scadenza il{" "}
+          {cookability.soonestExpiryDate.toLocaleDateString("it-IT")}: cucinala presto per non
+          sprecarli.
+        </p>
       )}
 
       <div>

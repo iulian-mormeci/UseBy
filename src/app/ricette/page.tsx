@@ -1,28 +1,69 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { getStockQuantityByProduct, computeCookability } from "@/lib/recipe-matching";
+import {
+  getStockQuantityByProduct,
+  getEarliestExpiryByProduct,
+  computeCookability,
+  sortByPriority,
+} from "@/lib/recipe-matching";
 
 export const dynamic = "force-dynamic";
+
+function toArray(value: string | string[] | undefined): string[] {
+  if (!value) return [];
+  return Array.isArray(value) ? value : [value];
+}
 
 export default async function RicettePage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; stato?: string }>;
+  searchParams: Promise<{
+    q?: string;
+    stato?: string;
+    productIds?: string | string[];
+    matchMode?: string;
+  }>;
 }) {
-  const { q, stato } = await searchParams;
+  const { q, stato, productIds: productIdsRaw, matchMode } = await searchParams;
+  const selectedProductIds = toArray(productIdsRaw).map(Number);
+  const isExactMatch = matchMode === "all";
 
-  const [recipes, stockByProduct] = await Promise.all([
+  const [recipes, stockByProduct, expiryByProduct, stockedProducts] = await Promise.all([
     prisma.recipe.findMany({
-      where: q ? { title: { contains: q, mode: "insensitive" } } : undefined,
+      where: {
+        ...(q ? { title: { contains: q, mode: "insensitive" } } : {}),
+        ...(selectedProductIds.length > 0
+          ? { ingredients: { some: { productId: { in: selectedProductIds } } } }
+          : {}),
+      },
       orderBy: { title: "asc" },
       include: { ingredients: { include: { product: true } } },
     }),
     getStockQuantityByProduct(),
+    getEarliestExpiryByProduct(),
+    prisma.product.findMany({
+      where: { stockItems: { some: {} } },
+      orderBy: { name: "asc" },
+      select: { id: true, name: true },
+    }),
   ]);
 
-  const recipesWithCookability = recipes
-    .map((recipe) => ({ recipe, cookability: computeCookability(recipe, stockByProduct) }))
+  const recipesMatchingSelection =
+    selectedProductIds.length > 0 && isExactMatch
+      ? recipes.filter((recipe) => {
+          const recipeProductIds = new Set(recipe.ingredients.map((i) => i.productId));
+          return selectedProductIds.every((id) => recipeProductIds.has(id));
+        })
+      : recipes;
+
+  const withCookability = recipesMatchingSelection
+    .map((recipe) => ({
+      recipe,
+      cookability: computeCookability(recipe, stockByProduct, expiryByProduct),
+    }))
     .filter(({ cookability }) => (stato === "cucinabili" ? cookability.isCookable : true));
+
+  const results = sortByPriority(withCookability);
 
   return (
     <div className="flex flex-col gap-6">
@@ -36,45 +77,83 @@ export default async function RicettePage({
         </Link>
       </div>
 
-      <form method="get" className="flex flex-wrap items-end gap-3">
-        <label className="flex flex-col gap-1">
-          <span className="text-sm font-medium">Cerca</span>
-          <input
-            type="text"
-            name="q"
-            defaultValue={q ?? ""}
-            className="rounded-md border border-gray-300 px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-900"
-          />
-        </label>
+      <form method="get" className="flex flex-col gap-4">
+        <div className="flex flex-wrap items-end gap-3">
+          <label className="flex flex-col gap-1">
+            <span className="text-sm font-medium">Cerca per titolo</span>
+            <input
+              type="text"
+              name="q"
+              defaultValue={q ?? ""}
+              className="rounded-md border border-gray-300 px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-900"
+            />
+          </label>
 
-        <label className="flex flex-col gap-1">
-          <span className="text-sm font-medium">Stato</span>
-          <select
-            name="stato"
-            defaultValue={stato ?? ""}
-            className="rounded-md border border-gray-300 px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-900"
+          <label className="flex flex-col gap-1">
+            <span className="text-sm font-medium">Stato</span>
+            <select
+              name="stato"
+              defaultValue={stato ?? ""}
+              className="rounded-md border border-gray-300 px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-900"
+            >
+              <option value="">Tutte</option>
+              <option value="cucinabili">Solo cucinabili ora</option>
+            </select>
+          </label>
+
+          <button
+            type="submit"
+            className="rounded-md border border-gray-300 px-3 py-2 text-sm font-medium dark:border-gray-700"
           >
-            <option value="">Tutte</option>
-            <option value="cucinabili">Solo cucinabili ora</option>
-          </select>
-        </label>
+            Filtra
+          </button>
+          <Link href="/ricette" className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
+            Reimposta
+          </Link>
+        </div>
 
-        <button
-          type="submit"
-          className="rounded-md border border-gray-300 px-3 py-2 text-sm font-medium dark:border-gray-700"
-        >
-          Filtra
-        </button>
-        <Link href="/ricette" className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
-          Reimposta
-        </Link>
+        {stockedProducts.length > 0 && (
+          <div className="flex flex-col gap-2 rounded-lg border border-gray-200 p-3 dark:border-gray-800">
+            <span className="text-sm font-medium">
+              Cerca ricette che usano questi prodotti dalla tua dispensa
+            </span>
+            <div className="flex flex-wrap gap-x-4 gap-y-2">
+              {stockedProducts.map((product) => (
+                <label key={product.id} className="flex items-center gap-1.5 text-sm">
+                  <input
+                    type="checkbox"
+                    name="productIds"
+                    value={product.id}
+                    defaultChecked={selectedProductIds.includes(product.id)}
+                  />
+                  {product.name}
+                </label>
+              ))}
+            </div>
+            <div className="flex gap-4 text-sm">
+              <label className="flex items-center gap-1.5">
+                <input
+                  type="radio"
+                  name="matchMode"
+                  value="any"
+                  defaultChecked={matchMode !== "all"}
+                />
+                Almeno uno dei prodotti selezionati
+              </label>
+              <label className="flex items-center gap-1.5">
+                <input type="radio" name="matchMode" value="all" defaultChecked={matchMode === "all"} />
+                Tutti i prodotti selezionati
+              </label>
+            </div>
+          </div>
+        )}
       </form>
 
-      {recipesWithCookability.length === 0 ? (
+      {results.length === 0 ? (
         <p className="text-sm text-gray-500 dark:text-gray-400">Nessuna ricetta trovata.</p>
       ) : (
         <ul className="divide-y divide-gray-200 rounded-lg border border-gray-200 dark:divide-gray-800 dark:border-gray-800">
-          {recipesWithCookability.map(({ recipe, cookability }) => (
+          {results.map(({ recipe, cookability }) => (
             <li key={recipe.id} className="flex items-center justify-between gap-4 p-3">
               <div>
                 <Link href={`/ricette/${recipe.id}`} className="font-medium hover:underline">
@@ -84,13 +163,24 @@ export default async function RicettePage({
                   {recipe.ingredients.length} ingredienti
                   {recipe.servings ? ` · ${recipe.servings} porzioni` : ""}
                 </div>
+                {cookability.missingIngredientNames.length > 0 && (
+                  <div className="text-sm text-red-600 dark:text-red-400">
+                    Manca: {cookability.missingIngredientNames.join(", ")}
+                  </div>
+                )}
+                {cookability.soonestExpiryDate && (
+                  <div className="text-sm text-amber-600 dark:text-amber-400">
+                    Ingredienti in scadenza il{" "}
+                    {cookability.soonestExpiryDate.toLocaleDateString("it-IT")}
+                  </div>
+                )}
               </div>
               {cookability.isCookable ? (
-                <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-200">
+                <span className="shrink-0 inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-200">
                   Puoi cucinarla
                 </span>
               ) : (
-                <span className="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800 dark:bg-red-900 dark:text-red-200">
+                <span className="shrink-0 inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800 dark:bg-red-900 dark:text-red-200">
                   {cookability.missingCount === 1
                     ? "Manca 1 ingrediente"
                     : `Mancano ${cookability.missingCount} ingredienti`}
