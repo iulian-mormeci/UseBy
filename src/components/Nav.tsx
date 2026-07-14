@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { LogoutButton } from "@/components/LogoutButton";
 
 const LINKS = [
   { href: "/", label: "Dashboard" },
@@ -10,17 +11,20 @@ const LINKS = [
   { href: "/prodotti", label: "Prodotti" },
   { href: "/categorie", label: "Categorie" },
   { href: "/ubicazioni", label: "Ubicazioni" },
-  { href: "/segnalazioni", label: "Segnalazioni" },
 ];
 
-export function Nav() {
+export function Nav({ isAdmin }: { isAdmin: boolean }) {
   const pathname = usePathname();
+
+  const links = isAdmin
+    ? [...LINKS, { href: "/segnalazioni", label: "Segnalazioni" }, { href: "/admin", label: "Admin" }]
+    : LINKS;
 
   return (
     <nav className="border-b border-gray-200 dark:border-gray-800">
       <div className="mx-auto flex max-w-4xl items-center gap-1 px-4 py-3">
         <span className="mr-4 font-semibold">UseBy</span>
-        {LINKS.map((link) => {
+        {links.map((link) => {
           const isActive = link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
           return (
             <Link
@@ -36,6 +40,18 @@ export function Nav() {
             </Link>
           );
         })}
+        <div className="ml-auto">
+          {isAdmin ? (
+            <LogoutButton className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800" />
+          ) : (
+            <Link
+              href="/login"
+              className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+            >
+              Accedi
+            </Link>
+          )}
+        </div>
       </div>
     </nav>
   );

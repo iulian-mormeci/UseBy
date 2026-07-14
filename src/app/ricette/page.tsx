@@ -6,6 +6,7 @@ import {
   computeCookability,
   sortByPriority,
 } from "@/lib/recipe-matching";
+import { isAdmin } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -28,7 +29,7 @@ export default async function RicettePage({
   const selectedProductIds = toArray(productIdsRaw).map(Number);
   const isExactMatch = matchMode === "all";
 
-  const [recipes, stockByProduct, expiryByProduct, stockedProducts] = await Promise.all([
+  const [recipes, stockByProduct, expiryByProduct, stockedProducts, admin] = await Promise.all([
     prisma.recipe.findMany({
       where: {
         ...(q ? { title: { contains: q, mode: "insensitive" } } : {}),
@@ -46,6 +47,7 @@ export default async function RicettePage({
       orderBy: { name: "asc" },
       select: { id: true, name: true },
     }),
+    isAdmin(),
   ]);
 
   const recipesMatchingSelection =
@@ -69,12 +71,14 @@ export default async function RicettePage({
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">Ricette</h1>
-        <Link
-          href="/ricette/nuovo"
-          className="rounded-md bg-gray-900 px-3 py-1.5 text-sm font-medium text-white dark:bg-gray-100 dark:text-gray-900"
-        >
-          + Aggiungi ricetta
-        </Link>
+        {admin && (
+          <Link
+            href="/ricette/nuovo"
+            className="rounded-md bg-gray-900 px-3 py-1.5 text-sm font-medium text-white dark:bg-gray-100 dark:text-gray-900"
+          >
+            + Aggiungi ricetta
+          </Link>
+        )}
       </div>
 
       <form method="get" className="flex flex-col gap-4">

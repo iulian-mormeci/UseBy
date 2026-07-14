@@ -61,3 +61,29 @@ un relay SMTP reale e omettere il profilo `dev` (Mailhog) in fase di avvio.
 `SMTP_HOST` dipende da come stai eseguendo l'app: `localhost` per `npm run dev`
 sull'host (Mailhog pubblica la porta 1025), `mailhog` se usi il profilo `dev` di
 docker-compose (rete interna dei container), il relay reale in produzione.
+
+## Pannello Admin
+
+Dashboard, dispensa, ricette, scansione barcode e segnalazione prodotti mancanti
+restano liberamente accessibili (pensati per l'uso quotidiano di tutta la
+famiglia). Un login protegge invece la gestione di catalogo/ricette/ubicazioni,
+la revisione dei prodotti scansionati ma non trovati altrove, e la
+configurazione del preavviso scadenze di default.
+
+Per abilitarlo, in `.env`:
+
+```bash
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD_HASH_BASE64=  # vedi comando sotto
+SESSION_SECRET=$(openssl rand -hex 32)
+```
+
+Genera l'hash della password (il base64 evita che i `$` dell'hash bcrypt
+vengano interpretati come variabili da docker-compose):
+
+```bash
+node -e "console.log(Buffer.from(require('bcryptjs').hashSync(process.argv[1], 10)).toString('base64'))" "la-tua-password"
+```
+
+Accedi da `/login`; il pannello è raggiungibile da `/admin` (link "Admin" in
+navbar quando autenticato).

@@ -8,6 +8,7 @@ import {
   computeCookability,
 } from "@/lib/recipe-matching";
 import { DeleteButton } from "@/components/DeleteButton";
+import { isAdmin } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -19,13 +20,14 @@ export default async function RicettaDetailPage({
   const id = parseId((await params).id);
   if (id === null) notFound();
 
-  const [recipe, stockByProduct, expiryByProduct] = await Promise.all([
+  const [recipe, stockByProduct, expiryByProduct, admin] = await Promise.all([
     prisma.recipe.findUnique({
       where: { id },
       include: { ingredients: { include: { product: true } } },
     }),
     getStockQuantityByProduct(),
     getEarliestExpiryByProduct(),
+    isAdmin(),
   ]);
 
   if (!recipe) notFound();
@@ -47,15 +49,17 @@ export default async function RicettaDetailPage({
               .join(" · ")}
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <Link
-            href={`/ricette/${recipe.id}/modifica`}
-            className="text-sm font-medium text-blue-600 hover:underline dark:text-blue-400"
-          >
-            Modifica
-          </Link>
-          <DeleteButton endpoint={`/api/recipes/${recipe.id}`} redirectTo="/ricette" />
-        </div>
+        {admin && (
+          <div className="flex items-center gap-3">
+            <Link
+              href={`/ricette/${recipe.id}/modifica`}
+              className="text-sm font-medium text-blue-600 hover:underline dark:text-blue-400"
+            >
+              Modifica
+            </Link>
+            <DeleteButton endpoint={`/api/recipes/${recipe.id}`} redirectTo="/ricette" />
+          </div>
+        )}
       </div>
 
       {cookability.isCookable ? (

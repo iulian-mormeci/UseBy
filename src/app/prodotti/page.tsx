@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { DeleteButton } from "@/components/DeleteButton";
+import { isAdmin } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -10,6 +11,7 @@ export default async function ProdottiPage({
   searchParams: Promise<{ categoryId?: string; q?: string }>;
 }) {
   const { categoryId, q } = await searchParams;
+  const admin = await isAdmin();
 
   const [products, categories] = await Promise.all([
     prisma.product.findMany({
@@ -103,15 +105,17 @@ export default async function ProdottiPage({
                   <td className="px-3 py-2">{product.unit.toLowerCase()}</td>
                   <td className="px-3 py-2">{product._count.stockItems}</td>
                   <td className="px-3 py-2">
-                    <div className="flex items-center gap-3">
-                      <Link
-                        href={`/prodotti/${product.id}/modifica`}
-                        className="text-sm font-medium text-blue-600 hover:underline dark:text-blue-400"
-                      >
-                        Modifica
-                      </Link>
-                      <DeleteButton endpoint={`/api/products/${product.id}`} />
-                    </div>
+                    {admin && (
+                      <div className="flex items-center gap-3">
+                        <Link
+                          href={`/prodotti/${product.id}/modifica`}
+                          className="text-sm font-medium text-blue-600 hover:underline dark:text-blue-400"
+                        >
+                          Modifica
+                        </Link>
+                        <DeleteButton endpoint={`/api/products/${product.id}`} />
+                      </div>
+                    )}
                   </td>
                 </tr>
               ))}
