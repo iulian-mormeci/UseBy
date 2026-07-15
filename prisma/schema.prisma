@@ -42,6 +42,13 @@ enum PendingProductSubmissionStatus {
   REJECTED
 }
 
+enum UsageType {
+  PACK
+  WEIGHT
+  QUANTITY
+  VOLUME
+}
+
 model Location {
   id         Int          @id @default(autoincrement())
   name       String       @unique
@@ -77,6 +84,8 @@ model Product {
   imageUrl             String?
   storageHint          String?
   unit                 UnitOfMeasure              @default(PIECE)
+  usageType            UsageType                  @default(QUANTITY)
+  defaultUnit          String                     @default("pcs")
   defaultShelfLifeDays Int?
   categoryId           Int?
   category             Category?                  @relation(fields: [categoryId], references: [id])
@@ -91,22 +100,24 @@ model Product {
 }
 
 model StockItem {
-  id          Int        @id @default(autoincrement())
-  productId   Int
-  product     Product    @relation(fields: [productId], references: [id], onDelete: Restrict)
-  locationId  Int
-  location    Location   @relation(fields: [locationId], references: [id])
-  zoneId      Int?
-  zone        Zone?      @relation(fields: [zoneId], references: [id], onDelete: SetNull)
-  quantity    Decimal    @default(1)
-  expiryDate  DateTime?
-  expiryType  ExpiryType @default(USE_BY)
-  leadDays    Int?
-  purchasedAt DateTime?
-  openedAt    DateTime?
-  notes       String?
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  id              Int        @id @default(autoincrement())
+  productId       Int
+  product         Product    @relation(fields: [productId], references: [id], onDelete: Restrict)
+  locationId      Int
+  location        Location   @relation(fields: [locationId], references: [id])
+  zoneId          Int?
+  zone            Zone?      @relation(fields: [zoneId], references: [id], onDelete: SetNull)
+  quantity        Decimal    @default(1)
+  initialQuantity Decimal?
+  currentQuantity Decimal?
+  expiryDate      DateTime?
+  expiryType      ExpiryType @default(USE_BY)
+  leadDays        Int?
+  purchasedAt     DateTime?
+  openedAt        DateTime?
+  notes           String?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
 
   @@index([productId])
   @@index([locationId])
