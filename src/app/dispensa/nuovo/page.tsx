@@ -14,7 +14,10 @@ export default async function NuovoStockItemPage({
   const defaultProductId = productId ? (parseId(productId) ?? undefined) : undefined;
 
   const [products, locations, zones] = await Promise.all([
-    prisma.product.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
+    prisma.product.findMany({
+      orderBy: { name: "asc" },
+      select: { id: true, name: true, usageType: true, defaultUnit: true },
+    }),
     prisma.location.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
     prisma.zone.findMany({
       orderBy: { name: "asc" },

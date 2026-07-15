@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { ExpiryBadge } from "@/components/ExpiryBadge";
 import { LOCATION_TYPE_LABELS } from "@/lib/location-labels";
 import { isExpired, isExpiringSoon } from "@/lib/expiry";
+import { ProductCard } from "@/components/ProductCard";
 import type { Prisma } from "@/generated/prisma/client";
 
 export const dynamic = "force-dynamic";
@@ -44,19 +44,24 @@ function groupByLocationAndZone(items: StockItemWithRelations[]) {
   return Array.from(byLocation.values()).sort((a, b) => a.location.name.localeCompare(b.location.name));
 }
 
-function StockItemRow({ item }: { item: StockItemWithRelations }) {
+function ProductCardGrid({ items, subtitle }: { items: StockItemWithRelations[]; subtitle?: (item: StockItemWithRelations) => string }) {
   return (
-    <li className="flex items-center justify-between gap-4 p-3 text-sm">
-      <div>
-        <Link href={`/dispensa/${item.id}/modifica`} className="font-medium hover:underline">
-          {item.product.name}
-        </Link>
-        <div className="text-gray-500 dark:text-gray-400">
-          {String(item.quantity)} {item.product.unit.toLowerCase()}
-        </div>
-      </div>
-      <ExpiryBadge expiryDate={item.expiryDate} />
-    </li>
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+      {items.map((item) => (
+        <ProductCard
+          key={item.id}
+          stockItemId={item.id}
+          productName={item.product.name}
+          imageUrl={item.product.imageUrl}
+          usageType={item.product.usageType}
+          currentQuantity={item.currentQuantity !== null ? Number(item.currentQuantity) : null}
+          initialQuantity={item.initialQuantity !== null ? Number(item.initialQuantity) : null}
+          unit={item.product.defaultUnit}
+          expiryDate={item.expiryDate}
+          subtitle={subtitle?.(item)}
+        />
+      ))}
+    </div>
   );
 }
 
@@ -112,11 +117,7 @@ export default async function DashboardPage() {
             Nessun prodotto in scadenza al momento.
           </p>
         ) : (
-          <ul className="divide-y divide-gray-200 rounded-lg border border-gray-200 dark:divide-gray-800 dark:border-gray-800">
-            {expiringItems.map((item) => (
-              <StockItemRow key={item.id} item={item} />
-            ))}
-          </ul>
+          <ProductCardGrid items={expiringItems} subtitle={(item) => item.location.name} />
         )}
       </div>
 
@@ -143,11 +144,7 @@ export default async function DashboardPage() {
                       <h4 className="mb-2 text-xs font-medium uppercase text-gray-500 dark:text-gray-400">
                         {zoneName}
                       </h4>
-                      <ul className="divide-y divide-gray-200 rounded-lg border border-gray-200 dark:divide-gray-800 dark:border-gray-800">
-                        {items.map((item) => (
-                          <StockItemRow key={item.id} item={item} />
-                        ))}
-                      </ul>
+                      <ProductCardGrid items={items} />
                     </div>
                   ))}
                 </div>

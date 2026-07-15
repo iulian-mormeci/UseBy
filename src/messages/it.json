@@ -1,0 +1,28 @@
+{
+  "Product": {
+    "usageTypeLabel": "Tipo di utilizzo",
+    "usageType": {
+      "PACK": "Pacco",
+      "WEIGHT": "Peso",
+      "QUANTITY": "Quantità",
+      "VOLUME": "Volume"
+    },
+    "defaultUnitLabel": "Unità di default"
+  },
+  "StockItemForm": {
+    "initialQuantityLabel": "Quantità iniziale",
+    "currentQuantityLabel": "Quantità attuale",
+    "packStateLabel": "Stato del pacco"
+  },
+  "QuantityIndicator": {
+    "piecesRemaining": "{current} / {initial} pz",
+    "noData": "Nessun dato di consumo",
+    "full": "Pieno",
+    "partial": "Parziale",
+    "nearlyEmpty": "Quasi vuoto",
+    "empty": "Vuoto"
+  },
+  "ProductCard": {
+    "noImage": "Nessuna immagine"
+  }
+}

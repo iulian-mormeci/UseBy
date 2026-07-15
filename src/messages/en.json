@@ -1,0 +1,28 @@
+{
+  "Product": {
+    "usageTypeLabel": "Usage type",
+    "usageType": {
+      "PACK": "Pack",
+      "WEIGHT": "Weight",
+      "QUANTITY": "Quantity",
+      "VOLUME": "Volume"
+    },
+    "defaultUnitLabel": "Default unit"
+  },
+  "StockItemForm": {
+    "initialQuantityLabel": "Initial quantity",
+    "currentQuantityLabel": "Current quantity",
+    "packStateLabel": "Pack status"
+  },
+  "QuantityIndicator": {
+    "piecesRemaining": "{current} / {initial} pcs",
+    "noData": "No tracking data",
+    "full": "Full",
+    "partial": "Partial",
+    "nearlyEmpty": "Nearly empty",
+    "empty": "Empty"
+  },
+  "ProductCard": {
+    "noImage": "No image"
+  }
+}

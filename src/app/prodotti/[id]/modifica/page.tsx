@@ -33,6 +33,8 @@ export default async function ModificaProdottoPage({
           imageUrl: product.imageUrl,
           storageHint: product.storageHint,
           unit: product.unit,
+          usageType: product.usageType,
+          defaultUnit: product.defaultUnit,
           defaultShelfLifeDays: product.defaultShelfLifeDays,
           categoryId: product.categoryId,
         }}

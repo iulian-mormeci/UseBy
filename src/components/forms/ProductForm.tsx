@@ -1,10 +1,19 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { submitJson, type FieldErrors } from "@/lib/api-client";
 
 type Category = { id: number; name: string };
+type UsageType = "PACK" | "WEIGHT" | "QUANTITY" | "VOLUME";
+
+const SUGGESTED_UNIT_BY_USAGE_TYPE: Record<UsageType, string> = {
+  PACK: "pack",
+  WEIGHT: "g",
+  QUANTITY: "pcs",
+  VOLUME: "ml",
+};
 
 type InitialData = {
   name?: string;
@@ -13,6 +22,8 @@ type InitialData = {
   imageUrl?: string | null;
   storageHint?: string | null;
   unit?: string;
+  usageType?: UsageType;
+  defaultUnit?: string;
   defaultShelfLifeDays?: number | null;
   categoryId?: number | null;
 };
@@ -35,12 +46,18 @@ export function ProductForm({
   onSuccess?: (product: CreatedProduct) => void;
 }) {
   const router = useRouter();
+  const t = useTranslations("Product");
   const [formError, setFormError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [submitting, setSubmitting] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(initialData?.imageUrl ?? null);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [defaultUnit, setDefaultUnit] = useState(initialData?.defaultUnit ?? "pcs");
+
+  function handleUsageTypeChange(event: ChangeEvent<HTMLSelectElement>) {
+    setDefaultUnit(SUGGESTED_UNIT_BY_USAGE_TYPE[event.target.value as UsageType]);
+  }
 
   async function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -81,6 +98,8 @@ export function ProductForm({
       imageUrl,
       storageHint: form.get("storageHint") || null,
       unit: form.get("unit"),
+      usageType: form.get("usageType"),
+      defaultUnit: form.get("defaultUnit"),
       defaultShelfLifeDays: shelfLifeRaw ? Number(shelfLifeRaw) : null,
       categoryId: categoryIdRaw ? Number(categoryIdRaw) : null,
     };
@@ -176,6 +195,32 @@ export function ProductForm({
           <option value="MILLILITER">Millilitri</option>
           <option value="LITER">Litri</option>
         </select>
+      </label>
+
+      <label className="flex flex-col gap-1">
+        <span className="text-sm font-medium">{t("usageTypeLabel")}</span>
+        <select
+          name="usageType"
+          defaultValue={initialData?.usageType ?? "QUANTITY"}
+          onChange={handleUsageTypeChange}
+          className="rounded-md border border-gray-300 px-3 py-2 dark:border-gray-700 dark:bg-gray-900"
+        >
+          <option value="PACK">{t("usageType.PACK")}</option>
+          <option value="WEIGHT">{t("usageType.WEIGHT")}</option>
+          <option value="QUANTITY">{t("usageType.QUANTITY")}</option>
+          <option value="VOLUME">{t("usageType.VOLUME")}</option>
+        </select>
+      </label>
+
+      <label className="flex flex-col gap-1">
+        <span className="text-sm font-medium">{t("defaultUnitLabel")}</span>
+        <input
+          type="text"
+          name="defaultUnit"
+          value={defaultUnit}
+          onChange={(event) => setDefaultUnit(event.target.value)}
+          className="rounded-md border border-gray-300 px-3 py-2 dark:border-gray-700 dark:bg-gray-900"
+        />
       </label>
 
       {lockedBarcode ? (

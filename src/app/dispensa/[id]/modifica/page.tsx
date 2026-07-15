@@ -15,7 +15,10 @@ export default async function ModificaStockItemPage({
 
   const [stockItem, products, locations, zones] = await Promise.all([
     prisma.stockItem.findUnique({ where: { id } }),
-    prisma.product.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
+    prisma.product.findMany({
+      orderBy: { name: "asc" },
+      select: { id: true, name: true, usageType: true, defaultUnit: true },
+    }),
     prisma.location.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
     prisma.zone.findMany({
       orderBy: { name: "asc" },
@@ -38,6 +41,10 @@ export default async function ModificaStockItemPage({
           locationId: stockItem.locationId,
           zoneId: stockItem.zoneId,
           quantity: String(stockItem.quantity),
+          initialQuantity:
+            stockItem.initialQuantity !== null ? String(stockItem.initialQuantity) : null,
+          currentQuantity:
+            stockItem.currentQuantity !== null ? String(stockItem.currentQuantity) : null,
           expiryDate: stockItem.expiryDate?.toISOString() ?? null,
           expiryType: stockItem.expiryType,
           leadDays: stockItem.leadDays,

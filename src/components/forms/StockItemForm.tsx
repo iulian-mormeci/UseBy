@@ -1,9 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
 import { submitJson, type FieldErrors } from "@/lib/api-client";
 
+type UsageType = "PACK" | "WEIGHT" | "QUANTITY" | "VOLUME";
+type ProductOption = { id: number; name: string; usageType: UsageType; defaultUnit: string };
 type Option = { id: number; name: string };
 type ZoneOption = { id: number; name: string; locationId: number };
 
@@ -12,6 +15,8 @@ type InitialData = {
   locationId: number;
   zoneId: number | null;
   quantity: string;
+  initialQuantity: string | null;
+  currentQuantity: string | null;
   expiryDate: string | null;
   expiryType: "USE_BY" | "BEST_BEFORE";
   leadDays: number | null;
@@ -19,6 +24,13 @@ type InitialData = {
   openedAt: string | null;
   notes: string | null;
 };
+
+const PACK_STEPS = [
+  { value: "0", key: "empty" },
+  { value: "33", key: "nearlyEmpty" },
+  { value: "66", key: "partial" },
+  { value: "100", key: "full" },
+] as const;
 
 function toDateInputValue(value: string | null): string {
   if (!value) return "";
@@ -33,7 +45,7 @@ export function StockItemForm({
   initialData,
   defaultProductId,
 }: {
-  products: Option[];
+  products: ProductOption[];
   locations: Option[];
   zones: ZoneOption[];
   stockItemId?: number;
@@ -41,14 +53,26 @@ export function StockItemForm({
   defaultProductId?: number;
 }) {
   const router = useRouter();
+  const t = useTranslations("StockItemForm");
+  const tQuantity = useTranslations("QuantityIndicator");
   const [formError, setFormError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [submitting, setSubmitting] = useState(false);
   const [locationId, setLocationId] = useState<string>(
     initialData?.locationId ? String(initialData.locationId) : "",
   );
+  const [productId, setProductId] = useState<string>(
+    initialData?.productId ? String(initialData.productId) : defaultProductId ? String(defaultProductId) : "",
+  );
+  const [initialQuantity, setInitialQuantity] = useState(initialData?.initialQuantity ?? "");
+  const [currentQuantity, setCurrentQuantity] = useState(
+    initialData?.currentQuantity ?? initialData?.initialQuantity ?? "",
+  );
 
   const zonesForLocation = zones.filter((zone) => String(zone.locationId) === locationId);
+  const selectedProduct = products.find((product) => String(product.id) === productId);
+  const usageType = selectedProduct?.usageType ?? "QUANTITY";
+  const unit = selectedProduct?.defaultUnit ?? "pcs";
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -65,6 +89,8 @@ export function StockItemForm({
       locationId: Number(form.get("locationId")),
       zoneId: zoneIdRaw ? Number(zoneIdRaw) : null,
       quantity: form.get("quantity"),
+      initialQuantity: initialQuantity ? Number(initialQuantity) : null,
+      currentQuantity: currentQuantity ? Number(currentQuantity) : null,
       expiryDate: form.get("expiryDate") || null,
       expiryType: form.get("expiryType"),
       leadDays: leadDaysRaw ? Number(leadDaysRaw) : null,
@@ -97,7 +123,8 @@ export function StockItemForm({
         <select
           name="productId"
           required
-          defaultValue={initialData?.productId ?? defaultProductId ?? ""}
+          value={productId}
+          onChange={(event) => setProductId(event.target.value)}
           className="rounded-md border border-gray-300 px-3 py-2 dark:border-gray-700 dark:bg-gray-900"
         >
           <option value="" disabled>
@@ -173,6 +200,86 @@ export function StockItemForm({
           <span className="text-xs text-red-600 dark:text-red-400">{fieldErrors.quantity[0]}</span>
         )}
       </label>
+
+      {selectedProduct && (
+        <div className="flex flex-col gap-3 rounded-lg border border-gray-200 p-3 dark:border-gray-800">
+          {usageType === "PACK" ? (
+            <label className="flex flex-col gap-1">
+              <span className="text-sm font-medium">{t("packStateLabel")}</span>
+              <select
+                value={currentQuantity || "100"}
+                onChange={(event) => {
+                  setInitialQuantity("100");
+                  setCurrentQuantity(event.target.value);
+                }}
+                className="rounded-md border border-gray-300 px-3 py-2 dark:border-gray-700 dark:bg-gray-900"
+              >
+                {PACK_STEPS.map((step) => (
+                  <option key={step.value} value={step.value}>
+                    {tQuantity(step.key)}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : (
+            <>
+              <label className="flex flex-col gap-1">
+                <span className="text-sm font-medium">
+                  {t("initialQuantityLabel")} ({unit})
+                </span>
+                <input
+                  type="number"
+                  step={usageType === "QUANTITY" ? "1" : "0.01"}
+                  min="0"
+                  value={initialQuantity}
+                  onChange={(event) => {
+                    setInitialQuantity(event.target.value);
+                    if (!currentQuantity) setCurrentQuantity(event.target.value);
+                  }}
+                  className="rounded-md border border-gray-300 px-3 py-2 dark:border-gray-700 dark:bg-gray-900"
+                />
+              </label>
+
+              <label className="flex flex-col gap-1">
+                <span className="text-sm font-medium">
+                  {t("currentQuantityLabel")} ({unit})
+                </span>
+                {usageType === "QUANTITY" ? (
+                  <input
+                    type="number"
+                    step="1"
+                    min="0"
+                    value={currentQuantity}
+                    onChange={(event) => setCurrentQuantity(event.target.value)}
+                    className="rounded-md border border-gray-300 px-3 py-2 dark:border-gray-700 dark:bg-gray-900"
+                  />
+                ) : (
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="range"
+                      min="0"
+                      max={initialQuantity || "0"}
+                      step="0.01"
+                      value={currentQuantity || "0"}
+                      onChange={(event) => setCurrentQuantity(event.target.value)}
+                      className="flex-1"
+                    />
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      max={initialQuantity || undefined}
+                      value={currentQuantity}
+                      onChange={(event) => setCurrentQuantity(event.target.value)}
+                      className="w-24 rounded-md border border-gray-300 px-2 py-1 dark:border-gray-700 dark:bg-gray-900"
+                    />
+                  </div>
+                )}
+              </label>
+            </>
+          )}
+        </div>
+      )}
 
       <div className="flex gap-4">
         <label className="flex flex-1 flex-col gap-1">
