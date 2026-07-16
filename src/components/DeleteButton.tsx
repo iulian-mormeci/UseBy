@@ -1,11 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 export function DeleteButton({
   endpoint,
-  confirmMessage = "Confermi l'eliminazione?",
+  confirmMessage,
   redirectTo,
 }: {
   endpoint: string;
@@ -13,18 +14,20 @@ export function DeleteButton({
   redirectTo?: string;
 }) {
   const router = useRouter();
+  const t = useTranslations("DeleteButton");
+  const tCommon = useTranslations("Common");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function handleClick() {
-    if (!window.confirm(confirmMessage)) return;
+    if (!window.confirm(confirmMessage ?? t("confirmDefault"))) return;
     setLoading(true);
     setError(null);
 
     const res = await fetch(endpoint, { method: "DELETE" });
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
-      setError(body.error ?? "Errore durante l'eliminazione");
+      setError(body.error ?? t("error"));
       setLoading(false);
       return;
     }
@@ -43,7 +46,7 @@ export function DeleteButton({
         disabled={loading}
         className="text-sm font-medium text-red-600 hover:underline disabled:opacity-50 dark:text-red-400"
       >
-        {loading ? "..." : "Elimina"}
+        {loading ? "..." : tCommon("delete")}
       </button>
       {error && <span className="text-xs text-red-600 dark:text-red-400">{error}</span>}
     </div>

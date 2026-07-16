@@ -1,4 +1,359 @@
 {
+  "Metadata": {
+    "title": "UseBy",
+    "description": "Gestione dispensa, frigo e congelatore"
+  },
+  "Common": {
+    "edit": "Modifica",
+    "delete": "Elimina",
+    "add": "Aggiungi",
+    "save": "Salva",
+    "saveChanges": "Salva modifiche",
+    "saving": "Salvataggio...",
+    "filter": "Filtra",
+    "reset": "Reimposta",
+    "optional": "opzionale"
+  },
+  "Nav": {
+    "dashboard": "Dashboard",
+    "dispensa": "Dispensa",
+    "ricette": "Ricette",
+    "prodotti": "Prodotti",
+    "categorie": "Categorie",
+    "ubicazioni": "Ubicazioni",
+    "segnalazioni": "Segnalazioni",
+    "admin": "Admin",
+    "login": "Accedi",
+    "logout": "Esci"
+  },
+  "ExpiryBadge": {
+    "noExpiry": "Nessuna scadenza",
+    "expiredOn": "Scaduto il {date}"
+  },
+  "DeleteButton": {
+    "confirmDefault": "Confermi l'eliminazione?",
+    "error": "Errore durante l'eliminazione"
+  },
+  "ZoneManager": {
+    "title": "Zone (es. ripiano alto, cassetto verdure)",
+    "noZones": "Nessuna zona definita.",
+    "newZoneLabel": "Nuova zona",
+    "confirmDeleteZone": "Eliminare questa zona?",
+    "errorCreating": "Errore durante la creazione della zona"
+  },
+  "ReportStatusActions": {
+    "markResolved": "Segna risolta",
+    "reject": "Rifiuta"
+  },
+  "PendingSubmissionStatusActions": {
+    "markIncluded": "Segna inclusa",
+    "reject": "Rifiuta"
+  },
+  "Dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Situazione di dispensa, frigo e congelatore.",
+    "statTotal": "Prodotti in dispensa",
+    "statExpired": "Scaduti",
+    "statExpiring": "In scadenza",
+    "expiringTitle": "In scadenza",
+    "addProduct": "+ Aggiungi prodotto",
+    "leadDaysHint": "Preavviso: {days} giorni (default), sovrascrivibile per singolo prodotto.",
+    "noExpiringItems": "Nessun prodotto in scadenza al momento.",
+    "overviewTitle": "Panoramica per reparto",
+    "noLocations": "Nessuna ubicazione con prodotti in dispensa.",
+    "noZoneLabel": "Senza zona"
+  },
+  "Dispensa": {
+    "title": "Dispensa",
+    "scanButton": "Scansiona codice a barre",
+    "addButton": "+ Aggiungi prodotto",
+    "locationLabel": "Ubicazione",
+    "allLocations": "Tutte",
+    "statusLabel": "Stato",
+    "allStatuses": "Tutti",
+    "statusExpiring": "In scadenza",
+    "statusExpired": "Scaduti",
+    "noItemsFound": "Nessun prodotto trovato.",
+    "colProduct": "Prodotto",
+    "colLocation": "Ubicazione",
+    "colZone": "Zona",
+    "colQuantity": "Quantità",
+    "colExpiry": "Scadenza",
+    "colActions": "Azioni"
+  },
+  "DispensaNuovo": {
+    "title": "Aggiungi prodotto in dispensa",
+    "noProductHint": "Non trovi il prodotto?",
+    "addToCatalogLink": "Aggiungilo al catalogo",
+    "orText": "o",
+    "scanLink": "scansiona il codice a barre",
+    "needProductAndLocation": "Servono almeno un prodotto e un'ubicazione prima di poter aggiungere un elemento in dispensa."
+  },
+  "DispensaModifica": {
+    "title": "Modifica prodotto in dispensa"
+  },
+  "DispensaScansiona": {
+    "title": "Scansiona codice a barre",
+    "subtitle": "Inquadra il codice a barre del prodotto con la fotocamera, oppure inseriscilo manualmente."
+  },
+  "ScanFlow": {
+    "searchError": "Errore durante la ricerca del prodotto",
+    "searching": "Ricerca in corso...",
+    "retry": "Riprova",
+    "alreadyInCatalog": "Già nel catalogo",
+    "addToStock": "Aggiungi alla dispensa",
+    "scanAnother": "Scansiona un altro codice",
+    "foundOnOff": "Trovato su Open Food Facts. Controlla i dati e salva nel catalogo.",
+    "cancelScanAnother": "Annulla e scansiona un altro codice",
+    "notFoundHint": "Prodotto non trovato né a catalogo né su Open Food Facts. Inseriscilo manualmente: verrà salvato e segnalato via email per una revisione.",
+    "submittedMessage": "Prodotto \"{name}\" salvato e segnalato per revisione."
+  },
+  "BarcodeScanner": {
+    "cameraUnavailable": "Fotocamera non disponibile",
+    "manualEntryHint": ". Puoi comunque inserire il codice a barre manualmente qui sotto.",
+    "manualBarcodeLabel": "Oppure inserisci il codice a barre",
+    "search": "Cerca"
+  },
+  "StockItemForm": {
+    "initialQuantityLabel": "Quantità iniziale",
+    "currentQuantityLabel": "Quantità attuale",
+    "packStateLabel": "Stato del pacco",
+    "productLabel": "Prodotto",
+    "selectProduct": "Seleziona un prodotto",
+    "locationLabel": "Ubicazione",
+    "selectLocation": "Seleziona un'ubicazione",
+    "zoneLabel": "Zona (opzionale)",
+    "noZone": "Nessuna zona",
+    "quantityLabel": "Quantità",
+    "expiryLabel": "Scadenza",
+    "expiryTypeLabel": "Tipo scadenza",
+    "useBy": "Da consumarsi entro",
+    "bestBefore": "Da consumarsi preferibilmente entro",
+    "leadDaysLabel": "Preavviso personalizzato (giorni, opzionale)",
+    "leadDaysPlaceholder": "Usa il default globale",
+    "purchasedAtLabel": "Acquistato il",
+    "openedAtLabel": "Aperto il",
+    "notesLabel": "Note",
+    "add": "Aggiungi"
+  },
+  "RicetteNuova": {
+    "title": "Aggiungi ricetta",
+    "noIngredientHint": "Non trovi un ingrediente?",
+    "addToCatalogLink": "Aggiungilo al catalogo",
+    "needProduct": "Serve almeno un prodotto a catalogo prima di poter creare una ricetta."
+  },
+  "RicetteModifica": {
+    "title": "Modifica ricetta"
+  },
+  "Ricette": {
+    "title": "Ricette",
+    "addButton": "+ Aggiungi ricetta",
+    "searchTitleLabel": "Cerca per titolo",
+    "statusLabel": "Stato",
+    "allStatuses": "Tutte",
+    "cookableOnly": "Solo cucinabili ora",
+    "stockSearchTitle": "Cerca ricette che usano questi prodotti dalla tua dispensa",
+    "matchAny": "Almeno uno dei prodotti selezionati",
+    "matchAll": "Tutti i prodotti selezionati",
+    "noResults": "Nessuna ricetta trovata.",
+    "ingredientsCount": "{count} ingredienti",
+    "servingsCount": "{count} porzioni",
+    "missingIngredients": "Manca: {names}",
+    "expiringIngredients": "Ingredienti in scadenza il {date}",
+    "cookableBadge": "Puoi cucinarla",
+    "missingBadgeOne": "Manca 1 ingrediente",
+    "missingBadgeMany": "Mancano {count} ingredienti"
+  },
+  "RicettaDetail": {
+    "cookableMessage": "Puoi cucinarla con quello che hai in dispensa",
+    "prepTime": "{minutes} min prep.",
+    "cookTime": "{minutes} min cottura",
+    "expiringHint": "Usa ingredienti in scadenza il {date}: cucinala presto per non sprecarli.",
+    "ingredientsTitle": "Ingredienti",
+    "requiredAvailable": "serve {required}, disponibili {available}",
+    "available": "disponibile",
+    "notAvailable": "non disponibile",
+    "instructionsTitle": "Istruzioni",
+    "notesTitle": "Note"
+  },
+  "RecipeForm": {
+    "titleLabel": "Titolo",
+    "instructionsLabel": "Istruzioni",
+    "servingsLabel": "Porzioni",
+    "prepLabel": "Preparazione (min)",
+    "cookLabel": "Cottura (min)",
+    "ingredientsLabel": "Ingredienti",
+    "addIngredient": "+ Aggiungi ingrediente",
+    "selectProduct": "Seleziona un prodotto",
+    "quantityPlaceholder": "Quantità",
+    "optionalLabel": "Opzionale",
+    "remove": "Rimuovi",
+    "notesLabel": "Note",
+    "create": "Crea ricetta"
+  },
+  "Prodotti": {
+    "title": "Prodotti",
+    "addButton": "+ Aggiungi prodotto",
+    "noProductHint": "Non trovi un prodotto?",
+    "reportLink": "Segnalalo",
+    "searchLabel": "Cerca",
+    "categoryLabel": "Categoria",
+    "allCategories": "Tutte",
+    "noProductsFound": "Nessun prodotto trovato.",
+    "colName": "Nome",
+    "colCategory": "Categoria",
+    "colUnit": "Unità",
+    "colInStock": "In dispensa",
+    "colActions": "Azioni"
+  },
+  "ProdottiNuovo": {
+    "title": "Aggiungi prodotto"
+  },
+  "ProdottiModifica": {
+    "title": "Modifica prodotto"
+  },
+  "ProductForm": {
+    "nameLabel": "Nome",
+    "brandLabel": "Marca (opzionale)",
+    "categoryLabel": "Categoria",
+    "noCategory": "Nessuna categoria",
+    "unitLabel": "Unità di misura",
+    "unit": {
+      "PIECE": "Pezzo",
+      "GRAM": "Grammi",
+      "KILOGRAM": "Chilogrammi",
+      "MILLILITER": "Millilitri",
+      "LITER": "Litri"
+    },
+    "barcodeLabel": "Codice a barre",
+    "barcodeOptionalLabel": "Codice a barre (opzionale)",
+    "shelfLifeLabel": "Durata tipica (giorni, opzionale)",
+    "storageHintLabel": "Suggerimento di conservazione (opzionale)",
+    "imageLabel": "Immagine (opzionale)",
+    "uploading": "Caricamento...",
+    "uploadError": "Errore durante il caricamento dell'immagine",
+    "imagePreviewAlt": "Anteprima prodotto",
+    "add": "Aggiungi"
+  },
+  "Categorie": {
+    "title": "Categorie",
+    "addButton": "+ Aggiungi categoria",
+    "noCategoriesFound": "Nessuna categoria creata.",
+    "colName": "Nome",
+    "colProducts": "Prodotti",
+    "colActions": "Azioni"
+  },
+  "CategorieNuova": {
+    "title": "Aggiungi categoria"
+  },
+  "CategorieModifica": {
+    "title": "Modifica categoria"
+  },
+  "CategoryForm": {
+    "nameLabel": "Nome",
+    "add": "Aggiungi"
+  },
+  "Ubicazioni": {
+    "title": "Ubicazioni",
+    "addButton": "+ Aggiungi ubicazione",
+    "noLocationsFound": "Nessuna ubicazione creata.",
+    "colName": "Nome",
+    "colType": "Tipo",
+    "colProducts": "Prodotti",
+    "colActions": "Azioni"
+  },
+  "UbicazioniNuova": {
+    "title": "Aggiungi ubicazione"
+  },
+  "UbicazioniModifica": {
+    "title": "Modifica ubicazione"
+  },
+  "LocationForm": {
+    "nameLabel": "Nome",
+    "typeLabel": "Tipo",
+    "type": {
+      "PANTRY": "Dispensa",
+      "FRIDGE": "Frigo",
+      "FREEZER": "Congelatore"
+    },
+    "add": "Aggiungi"
+  },
+  "LocationType": {
+    "PANTRY": "Dispensa",
+    "FRIDGE": "Frigo",
+    "FREEZER": "Congelatore"
+  },
+  "Segnalazioni": {
+    "title": "Segnalazioni prodotti mancanti",
+    "addButton": "+ Segnala prodotto",
+    "statusLabel": "Stato",
+    "allStatuses": "Tutte",
+    "statusPending": "In sospeso",
+    "statusResolved": "Risolte",
+    "statusRejected": "Rifiutate",
+    "noReportsFound": "Nessuna segnalazione trovata.",
+    "colProduct": "Prodotto richiesto",
+    "colNote": "Note",
+    "colStatus": "Stato",
+    "colEmail": "Email",
+    "colActions": "Azioni",
+    "emailSent": "Inviata",
+    "emailNotSent": "Non inviata"
+  },
+  "SegnalazioniNuova": {
+    "title": "Segnala prodotto mancante",
+    "subtitle": "Non trovi un prodotto nel catalogo? Segnalalo: riceveremo una notifica via email."
+  },
+  "MissingProductReportForm": {
+    "nameLabel": "Nome del prodotto",
+    "noteLabel": "Note (opzionale)",
+    "send": "Invia segnalazione",
+    "sending": "Invio...",
+    "thankYou": "Grazie, la segnalazione è stata inviata."
+  },
+  "Admin": {
+    "title": "Pannello Admin",
+    "linkProductsHint": "Modifica ed elimina voci di catalogo",
+    "linkCategoriesHint": "Aggiungi, modifica, elimina",
+    "linkLocationsHint": "Aggiungi, modifica, elimina",
+    "linkRecipesHint": "Aggiungi, modifica, elimina",
+    "linkReportsHint": "Gestisci lo stato",
+    "linkPending": "Prodotti da revisionare",
+    "linkPendingHint": "{count} in attesa",
+    "linkSettings": "Impostazioni",
+    "linkSettingsHint": "Preavviso scadenza di default"
+  },
+  "AdminPendingSubmissions": {
+    "title": "Prodotti da revisionare",
+    "subtitle": "Prodotti creati da un codice a barre non trovato né a catalogo né su Open Food Facts.",
+    "statusLabel": "Stato",
+    "allStatuses": "Tutte",
+    "statusPending": "In attesa",
+    "statusEmailed": "Email inviata",
+    "statusIncluded": "Incluse",
+    "statusRejected": "Rifiutate",
+    "noneFound": "Nessuna segnalazione trovata.",
+    "colProduct": "Prodotto",
+    "colBarcode": "Codice a barre",
+    "colStatus": "Stato",
+    "colActions": "Azioni"
+  },
+  "Login": {
+    "title": "Accedi",
+    "usernameLabel": "Nome utente",
+    "passwordLabel": "Password",
+    "submit": "Accedi",
+    "submitting": "Accesso...",
+    "invalidCredentials": "Credenziali non valide"
+  },
+  "Settings": {
+    "title": "Impostazioni",
+    "leadDaysHint": "Numero di giorni prima della scadenza di un prodotto in cui comparirà tra quelli \"in scadenza\". Può essere sovrascritto per singolo prodotto in dispensa.",
+    "leadDaysLabel": "Preavviso scadenza di default (giorni)",
+    "saved": "Impostazioni salvate.",
+    "languageSectionTitle": "Lingua",
+    "languageLabel": "Lingua dell'interfaccia"
+  },
   "Product": {
     "usageTypeLabel": "Tipo di utilizzo",
     "usageType": {
@@ -8,11 +363,6 @@
       "VOLUME": "Volume"
     },
     "defaultUnitLabel": "Unità di default"
-  },
-  "StockItemForm": {
-    "initialQuantityLabel": "Quantità iniziale",
-    "currentQuantityLabel": "Quantità attuale",
-    "packStateLabel": "Stato del pacco"
   },
   "QuantityIndicator": {
     "piecesRemaining": "{current} / {initial} pz",

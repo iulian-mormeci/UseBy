@@ -47,6 +47,8 @@ export function ProductForm({
 }) {
   const router = useRouter();
   const t = useTranslations("Product");
+  const tForm = useTranslations("ProductForm");
+  const tCommon = useTranslations("Common");
   const [formError, setFormError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [submitting, setSubmitting] = useState(false);
@@ -72,7 +74,7 @@ export function ProductForm({
 
     if (!res.ok) {
       const errorBody = await res.json().catch(() => ({}));
-      setUploadError(errorBody.error ?? "Errore durante il caricamento dell'immagine");
+      setUploadError(errorBody.error ?? tForm("uploadError"));
       setUploading(false);
       return;
     }
@@ -143,7 +145,7 @@ export function ProductForm({
       {formError && <p className="text-sm text-red-600 dark:text-red-400">{formError}</p>}
 
       <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Nome</span>
+        <span className="text-sm font-medium">{tForm("nameLabel")}</span>
         <input
           type="text"
           name="name"
@@ -157,7 +159,7 @@ export function ProductForm({
       </label>
 
       <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Marca (opzionale)</span>
+        <span className="text-sm font-medium">{tForm("brandLabel")}</span>
         <input
           type="text"
           name="brand"
@@ -167,13 +169,13 @@ export function ProductForm({
       </label>
 
       <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Categoria</span>
+        <span className="text-sm font-medium">{tForm("categoryLabel")}</span>
         <select
           name="categoryId"
           defaultValue={initialData?.categoryId ?? ""}
           className="rounded-md border border-gray-300 px-3 py-2 dark:border-gray-700 dark:bg-gray-900"
         >
-          <option value="">Nessuna categoria</option>
+          <option value="">{tForm("noCategory")}</option>
           {categories.map((category) => (
             <option key={category.id} value={category.id}>
               {category.name}
@@ -183,17 +185,17 @@ export function ProductForm({
       </label>
 
       <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Unità di misura</span>
+        <span className="text-sm font-medium">{tForm("unitLabel")}</span>
         <select
           name="unit"
           defaultValue={initialData?.unit ?? "PIECE"}
           className="rounded-md border border-gray-300 px-3 py-2 dark:border-gray-700 dark:bg-gray-900"
         >
-          <option value="PIECE">Pezzo</option>
-          <option value="GRAM">Grammi</option>
-          <option value="KILOGRAM">Chilogrammi</option>
-          <option value="MILLILITER">Millilitri</option>
-          <option value="LITER">Litri</option>
+          <option value="PIECE">{tForm("unit.PIECE")}</option>
+          <option value="GRAM">{tForm("unit.GRAM")}</option>
+          <option value="KILOGRAM">{tForm("unit.KILOGRAM")}</option>
+          <option value="MILLILITER">{tForm("unit.MILLILITER")}</option>
+          <option value="LITER">{tForm("unit.LITER")}</option>
         </select>
       </label>
 
@@ -225,12 +227,12 @@ export function ProductForm({
 
       {lockedBarcode ? (
         <div className="flex flex-col gap-1">
-          <span className="text-sm font-medium">Codice a barre</span>
+          <span className="text-sm font-medium">{tForm("barcodeLabel")}</span>
           <span className="text-sm text-gray-500 dark:text-gray-400">{lockedBarcode}</span>
         </div>
       ) : (
         <label className="flex flex-col gap-1">
-          <span className="text-sm font-medium">Codice a barre (opzionale)</span>
+          <span className="text-sm font-medium">{tForm("barcodeOptionalLabel")}</span>
           <input
             type="text"
             name="barcode"
@@ -244,7 +246,7 @@ export function ProductForm({
       )}
 
       <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Durata tipica (giorni, opzionale)</span>
+        <span className="text-sm font-medium">{tForm("shelfLifeLabel")}</span>
         <input
           type="number"
           name="defaultShelfLifeDays"
@@ -255,7 +257,7 @@ export function ProductForm({
       </label>
 
       <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Suggerimento di conservazione (opzionale)</span>
+        <span className="text-sm font-medium">{tForm("storageHintLabel")}</span>
         <textarea
           name="storageHint"
           rows={2}
@@ -265,17 +267,17 @@ export function ProductForm({
       </label>
 
       <div className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Immagine (opzionale)</span>
+        <span className="text-sm font-medium">{tForm("imageLabel")}</span>
         <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleFileChange} />
         {uploading && (
-          <span className="text-xs text-gray-500 dark:text-gray-400">Caricamento...</span>
+          <span className="text-xs text-gray-500 dark:text-gray-400">{tForm("uploading")}</span>
         )}
         {uploadError && (
           <span className="text-xs text-red-600 dark:text-red-400">{uploadError}</span>
         )}
         {imageUrl && (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={imageUrl} alt="Anteprima prodotto" className="mt-2 h-24 w-24 rounded-md object-cover" />
+          <img src={imageUrl} alt={tForm("imagePreviewAlt")} className="mt-2 h-24 w-24 rounded-md object-cover" />
         )}
       </div>
 
@@ -284,7 +286,7 @@ export function ProductForm({
         disabled={submitting || uploading}
         className="rounded-md bg-gray-900 px-4 py-2 font-medium text-white disabled:opacity-50 dark:bg-gray-100 dark:text-gray-900"
       >
-        {submitting ? "Salvataggio..." : productId ? "Salva modifiche" : "Aggiungi"}
+        {submitting ? tCommon("saving") : productId ? tCommon("saveChanges") : tForm("add")}
       </button>
     </form>
   );

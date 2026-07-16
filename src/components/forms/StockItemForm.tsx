@@ -55,6 +55,7 @@ export function StockItemForm({
   const router = useRouter();
   const t = useTranslations("StockItemForm");
   const tQuantity = useTranslations("QuantityIndicator");
+  const tCommon = useTranslations("Common");
   const [formError, setFormError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [submitting, setSubmitting] = useState(false);
@@ -119,7 +120,7 @@ export function StockItemForm({
       {formError && <p className="text-sm text-red-600 dark:text-red-400">{formError}</p>}
 
       <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Prodotto</span>
+        <span className="text-sm font-medium">{t("productLabel")}</span>
         <select
           name="productId"
           required
@@ -128,7 +129,7 @@ export function StockItemForm({
           className="rounded-md border border-gray-300 px-3 py-2 dark:border-gray-700 dark:bg-gray-900"
         >
           <option value="" disabled>
-            Seleziona un prodotto
+            {t("selectProduct")}
           </option>
           {products.map((product) => (
             <option key={product.id} value={product.id}>
@@ -143,7 +144,7 @@ export function StockItemForm({
 
       <div className="flex gap-4">
         <label className="flex flex-1 flex-col gap-1">
-          <span className="text-sm font-medium">Ubicazione</span>
+          <span className="text-sm font-medium">{t("locationLabel")}</span>
           <select
             name="locationId"
             required
@@ -152,7 +153,7 @@ export function StockItemForm({
             className="rounded-md border border-gray-300 px-3 py-2 dark:border-gray-700 dark:bg-gray-900"
           >
             <option value="" disabled>
-              Seleziona un&apos;ubicazione
+              {t("selectLocation")}
             </option>
             {locations.map((location) => (
               <option key={location.id} value={location.id}>
@@ -168,14 +169,14 @@ export function StockItemForm({
         </label>
 
         <label className="flex flex-1 flex-col gap-1">
-          <span className="text-sm font-medium">Zona (opzionale)</span>
+          <span className="text-sm font-medium">{t("zoneLabel")}</span>
           <select
             name="zoneId"
             defaultValue={initialData?.zoneId ?? ""}
             disabled={zonesForLocation.length === 0}
             className="rounded-md border border-gray-300 px-3 py-2 disabled:opacity-50 dark:border-gray-700 dark:bg-gray-900"
           >
-            <option value="">Nessuna zona</option>
+            <option value="">{t("noZone")}</option>
             {zonesForLocation.map((zone) => (
               <option key={zone.id} value={zone.id}>
                 {zone.name}
@@ -186,7 +187,7 @@ export function StockItemForm({
       </div>
 
       <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Quantità</span>
+        <span className="text-sm font-medium">{t("quantityLabel")}</span>
         <input
           type="number"
           name="quantity"
@@ -283,7 +284,7 @@ export function StockItemForm({
 
       <div className="flex gap-4">
         <label className="flex flex-1 flex-col gap-1">
-          <span className="text-sm font-medium">Scadenza</span>
+          <span className="text-sm font-medium">{t("expiryLabel")}</span>
           <input
             type="date"
             name="expiryDate"
@@ -293,33 +294,33 @@ export function StockItemForm({
         </label>
 
         <label className="flex flex-1 flex-col gap-1">
-          <span className="text-sm font-medium">Tipo scadenza</span>
+          <span className="text-sm font-medium">{t("expiryTypeLabel")}</span>
           <select
             name="expiryType"
             defaultValue={initialData?.expiryType ?? "USE_BY"}
             className="rounded-md border border-gray-300 px-3 py-2 dark:border-gray-700 dark:bg-gray-900"
           >
-            <option value="USE_BY">Da consumarsi entro</option>
-            <option value="BEST_BEFORE">Da consumarsi preferibilmente entro</option>
+            <option value="USE_BY">{t("useBy")}</option>
+            <option value="BEST_BEFORE">{t("bestBefore")}</option>
           </select>
         </label>
       </div>
 
       <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Preavviso personalizzato (giorni, opzionale)</span>
+        <span className="text-sm font-medium">{t("leadDaysLabel")}</span>
         <input
           type="number"
           name="leadDays"
           min="0"
           defaultValue={initialData?.leadDays ?? ""}
-          placeholder="Usa il default globale"
+          placeholder={t("leadDaysPlaceholder")}
           className="rounded-md border border-gray-300 px-3 py-2 dark:border-gray-700 dark:bg-gray-900"
         />
       </label>
 
       <div className="flex gap-4">
         <label className="flex flex-1 flex-col gap-1">
-          <span className="text-sm font-medium">Acquistato il</span>
+          <span className="text-sm font-medium">{t("purchasedAtLabel")}</span>
           <input
             type="date"
             name="purchasedAt"
@@ -329,7 +330,7 @@ export function StockItemForm({
         </label>
 
         <label className="flex flex-1 flex-col gap-1">
-          <span className="text-sm font-medium">Aperto il</span>
+          <span className="text-sm font-medium">{t("openedAtLabel")}</span>
           <input
             type="date"
             name="openedAt"
@@ -340,7 +341,7 @@ export function StockItemForm({
       </div>
 
       <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Note</span>
+        <span className="text-sm font-medium">{t("notesLabel")}</span>
         <textarea
           name="notes"
           rows={3}
@@ -354,7 +355,7 @@ export function StockItemForm({
         disabled={submitting}
         className="rounded-md bg-gray-900 px-4 py-2 font-medium text-white disabled:opacity-50 dark:bg-gray-100 dark:text-gray-900"
       >
-        {submitting ? "Salvataggio..." : stockItemId ? "Salva modifiche" : "Aggiungi"}
+        {submitting ? tCommon("saving") : stockItemId ? tCommon("saveChanges") : t("add")}
       </button>
     </form>
   );

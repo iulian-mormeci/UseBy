@@ -1,6 +1,6 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
-import { LOCATION_TYPE_LABELS } from "@/lib/location-labels";
 import { isExpired, isExpiringSoon } from "@/lib/expiry";
 import { ProductCard } from "@/components/ProductCard";
 import type { Prisma } from "@/generated/prisma/client";
@@ -23,7 +23,7 @@ function StatCard({ label, value, href }: { label: string; value: number; href: 
   );
 }
 
-function groupByLocationAndZone(items: StockItemWithRelations[]) {
+function groupByLocationAndZone(items: StockItemWithRelations[], noZoneLabel: string) {
   const byLocation = new Map<
     number,
     { location: StockItemWithRelations["location"]; zoneGroups: Map<string, StockItemWithRelations[]> }
@@ -34,7 +34,7 @@ function groupByLocationAndZone(items: StockItemWithRelations[]) {
       byLocation.set(item.locationId, { location: item.location, zoneGroups: new Map() });
     }
     const entry = byLocation.get(item.locationId)!;
-    const zoneName = item.zone?.name ?? "Senza zona";
+    const zoneName = item.zone?.name ?? noZoneLabel;
     if (!entry.zoneGroups.has(zoneName)) {
       entry.zoneGroups.set(zoneName, []);
     }
@@ -66,12 +66,14 @@ function ProductCardGrid({ items, subtitle }: { items: StockItemWithRelations[];
 }
 
 export default async function DashboardPage() {
-  const [stockItems, notificationSetting] = await Promise.all([
+  const [stockItems, notificationSetting, t, tLocationType] = await Promise.all([
     prisma.stockItem.findMany({
       orderBy: [{ expiryDate: { sort: "asc", nulls: "last" } }, { createdAt: "desc" }],
       include: { product: true, location: true, zone: true },
     }),
     prisma.notificationSetting.upsert({ where: { id: 1 }, update: {}, create: { id: 1 } }),
+    getTranslations("Dashboard"),
+    getTranslations("LocationType"),
   ]);
 
   const defaultLeadDays = notificationSetting.defaultLeadDays;
@@ -80,22 +82,20 @@ export default async function DashboardPage() {
     isExpiringSoon(item.expiryDate, item.leadDays, defaultLeadDays),
   );
   const expiredCount = stockItems.filter((item) => isExpired(item.expiryDate)).length;
-  const groupedByLocation = groupByLocationAndZone(stockItems);
+  const groupedByLocation = groupByLocationAndZone(stockItems, t("noZoneLabel"));
 
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <h1 className="text-xl font-semibold">Dashboard</h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          Situazione di dispensa, frigo e congelatore.
-        </p>
+        <h1 className="text-xl font-semibold">{t("title")}</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400">{t("subtitle")}</p>
       </div>
 
       <div className="flex gap-4">
-        <StatCard label="Prodotti in dispensa" value={stockItems.length} href="/dispensa" />
-        <StatCard label="Scaduti" value={expiredCount} href="/dispensa?stato=scaduti" />
+        <StatCard label={t("statTotal")} value={stockItems.length} href="/dispensa" />
+        <StatCard label={t("statExpired")} value={expiredCount} href="/dispensa?stato=scaduti" />
         <StatCard
-          label="In scadenza"
+          label={t("statExpiring")}
           value={expiringItems.length}
           href="/dispensa?stato=in-scadenza"
         />
@@ -103,31 +103,27 @@ export default async function DashboardPage() {
 
       <div>
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="font-medium">In scadenza</h2>
+          <h2 className="font-medium">{t("expiringTitle")}</h2>
           <Link href="/dispensa/nuovo" className="text-sm font-medium text-blue-600 dark:text-blue-400">
-            + Aggiungi prodotto
+            {t("addProduct")}
           </Link>
         </div>
         <p className="mb-3 text-xs text-gray-500 dark:text-gray-400">
-          Preavviso: {defaultLeadDays} giorni (default), sovrascrivibile per singolo prodotto.
+          {t("leadDaysHint", { days: defaultLeadDays })}
         </p>
 
         {expiringItems.length === 0 ? (
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Nessun prodotto in scadenza al momento.
-          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{t("noExpiringItems")}</p>
         ) : (
           <ProductCardGrid items={expiringItems} subtitle={(item) => item.location.name} />
         )}
       </div>
 
       <div>
-        <h2 className="mb-3 font-medium">Panoramica per reparto</h2>
+        <h2 className="mb-3 font-medium">{t("overviewTitle")}</h2>
 
         {groupedByLocation.length === 0 ? (
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Nessuna ubicazione con prodotti in dispensa.
-          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{t("noLocations")}</p>
         ) : (
           <div className="flex flex-col gap-6">
             {groupedByLocation.map(({ location, zoneGroups }) => (
@@ -135,7 +131,7 @@ export default async function DashboardPage() {
                 <h3 className="text-sm font-semibold">
                   {location.name}{" "}
                   <span className="font-normal text-gray-500 dark:text-gray-400">
-                    ({LOCATION_TYPE_LABELS[location.type]})
+                    ({tLocationType(location.type)})
                   </span>
                 </h3>
                 <div className="flex flex-col gap-4 pl-4">

@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { ProductForm } from "@/components/forms/ProductForm";
 import { parseId } from "@/lib/parse-id";
@@ -13,16 +14,17 @@ export default async function ModificaProdottoPage({
   const id = parseId((await params).id);
   if (id === null) notFound();
 
-  const [product, categories] = await Promise.all([
+  const [product, categories, t] = await Promise.all([
     prisma.product.findUnique({ where: { id } }),
     prisma.category.findMany({ orderBy: { name: "asc" } }),
+    getTranslations("ProdottiModifica"),
   ]);
 
   if (!product) notFound();
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-xl font-semibold">Modifica prodotto</h1>
+      <h1 className="text-xl font-semibold">{t("title")}</h1>
       <ProductForm
         categories={categories}
         productId={product.id}

@@ -1,3 +1,7 @@
+"use client";
+
+import { useFormatter, useTranslations } from "next-intl";
+
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 type ExpiryStatus = "none" | "expired" | "urgent" | "soon" | "ok";
@@ -19,20 +23,24 @@ const STYLES: Record<ExpiryStatus, string> = {
   ok: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
 };
 
-function formatLabel(expiryDate: Date | null, status: ExpiryStatus): string {
-  if (!expiryDate) return "Nessuna scadenza";
-  const formatted = expiryDate.toLocaleDateString("it-IT");
-  if (status === "expired") return `Scaduto il ${formatted}`;
-  return formatted;
-}
-
 export function ExpiryBadge({ expiryDate }: { expiryDate: Date | null }) {
+  const t = useTranslations("ExpiryBadge");
+  const format = useFormatter();
   const status = getExpiryStatus(expiryDate);
+
+  let label: string;
+  if (!expiryDate) {
+    label = t("noExpiry");
+  } else {
+    const formatted = format.dateTime(expiryDate, { dateStyle: "short" });
+    label = status === "expired" ? t("expiredOn", { date: formatted }) : formatted;
+  }
+
   return (
     <span
       className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${STYLES[status]}`}
     >
-      {formatLabel(expiryDate, status)}
+      {label}
     </span>
   );
 }

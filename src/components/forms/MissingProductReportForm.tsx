@@ -1,9 +1,11 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
 import { submitJson, type FieldErrors } from "@/lib/api-client";
 
 export function MissingProductReportForm() {
+  const t = useTranslations("MissingProductReportForm");
   const [formError, setFormError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [submitting, setSubmitting] = useState(false);
@@ -36,7 +38,7 @@ export function MissingProductReportForm() {
   if (sent) {
     return (
       <p className="text-sm text-green-700 dark:text-green-400">
-        Grazie, la segnalazione è stata inviata.
+        {t("thankYou")}
       </p>
     );
   }
@@ -46,7 +48,7 @@ export function MissingProductReportForm() {
       {formError && <p className="text-sm text-red-600 dark:text-red-400">{formError}</p>}
 
       <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Nome del prodotto</span>
+        <span className="text-sm font-medium">{t("nameLabel")}</span>
         <input
           type="text"
           name="requestedName"
@@ -61,7 +63,7 @@ export function MissingProductReportForm() {
       </label>
 
       <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Note (opzionale)</span>
+        <span className="text-sm font-medium">{t("noteLabel")}</span>
         <textarea
           name="note"
           rows={3}
@@ -74,7 +76,7 @@ export function MissingProductReportForm() {
         disabled={submitting}
         className="rounded-md bg-gray-900 px-4 py-2 font-medium text-white disabled:opacity-50 dark:bg-gray-100 dark:text-gray-900"
       >
-        {submitting ? "Invio..." : "Invia segnalazione"}
+        {submitting ? t("sending") : t("send")}
       </button>
     </form>
   );

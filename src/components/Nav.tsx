@@ -2,22 +2,24 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { LogoutButton } from "@/components/LogoutButton";
-
-const LINKS = [
-  { href: "/", label: "Dashboard" },
-  { href: "/dispensa", label: "Dispensa" },
-  { href: "/ricette", label: "Ricette" },
-  { href: "/prodotti", label: "Prodotti" },
-  { href: "/categorie", label: "Categorie" },
-  { href: "/ubicazioni", label: "Ubicazioni" },
-];
 
 export function Nav({ isAdmin }: { isAdmin: boolean }) {
   const pathname = usePathname();
+  const t = useTranslations("Nav");
+
+  const LINKS = [
+    { href: "/", label: t("dashboard") },
+    { href: "/dispensa", label: t("dispensa") },
+    { href: "/ricette", label: t("ricette") },
+    { href: "/prodotti", label: t("prodotti") },
+    { href: "/categorie", label: t("categorie") },
+    { href: "/ubicazioni", label: t("ubicazioni") },
+  ];
 
   const links = isAdmin
-    ? [...LINKS, { href: "/segnalazioni", label: "Segnalazioni" }, { href: "/admin", label: "Admin" }]
+    ? [...LINKS, { href: "/segnalazioni", label: t("segnalazioni") }, { href: "/admin", label: t("admin") }]
     : LINKS;
 
   return (
@@ -48,7 +50,7 @@ export function Nav({ isAdmin }: { isAdmin: boolean }) {
               href="/login"
               className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
             >
-              Accedi
+              {t("login")}
             </Link>
           )}
         </div>

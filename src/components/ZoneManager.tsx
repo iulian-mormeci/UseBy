@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
 import { DeleteButton } from "@/components/DeleteButton";
 
@@ -8,6 +9,8 @@ type Zone = { id: number; name: string };
 
 export function ZoneManager({ locationId, zones }: { locationId: number; zones: Zone[] }) {
   const router = useRouter();
+  const t = useTranslations("ZoneManager");
+  const tCommon = useTranslations("Common");
   const [name, setName] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -25,7 +28,7 @@ export function ZoneManager({ locationId, zones }: { locationId: number; zones: 
 
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
-      setError(body.error ?? "Errore durante la creazione della zona");
+      setError(body.error ?? t("errorCreating"));
       setSubmitting(false);
       return;
     }
@@ -37,16 +40,19 @@ export function ZoneManager({ locationId, zones }: { locationId: number; zones: 
 
   return (
     <div className="flex flex-col gap-3">
-      <span className="text-sm font-medium">Zone (es. ripiano alto, cassetto verdure)</span>
+      <span className="text-sm font-medium">{t("title")}</span>
 
       {zones.length === 0 ? (
-        <p className="text-sm text-gray-500 dark:text-gray-400">Nessuna zona definita.</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">{t("noZones")}</p>
       ) : (
         <ul className="flex flex-col gap-1">
           {zones.map((zone) => (
             <li key={zone.id} className="flex items-center justify-between gap-3 text-sm">
               <span>{zone.name}</span>
-              <DeleteButton endpoint={`/api/zones/${zone.id}`} confirmMessage="Eliminare questa zona?" />
+              <DeleteButton
+                endpoint={`/api/zones/${zone.id}`}
+                confirmMessage={t("confirmDeleteZone")}
+              />
             </li>
           ))}
         </ul>
@@ -54,7 +60,7 @@ export function ZoneManager({ locationId, zones }: { locationId: number; zones: 
 
       <form onSubmit={handleSubmit} className="flex items-end gap-2">
         <label className="flex flex-1 flex-col gap-1">
-          <span className="text-sm font-medium">Nuova zona</span>
+          <span className="text-sm font-medium">{t("newZoneLabel")}</span>
           <input
             type="text"
             value={name}
@@ -68,7 +74,7 @@ export function ZoneManager({ locationId, zones }: { locationId: number; zones: 
           disabled={submitting}
           className="rounded-md border border-gray-300 px-3 py-2 text-sm font-medium disabled:opacity-50 dark:border-gray-700"
         >
-          Aggiungi
+          {tCommon("add")}
         </button>
       </form>
       {error && <span className="text-xs text-red-600 dark:text-red-400">{error}</span>}

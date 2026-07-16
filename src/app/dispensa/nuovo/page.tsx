@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { StockItemForm } from "@/components/forms/StockItemForm";
 import { parseId } from "@/lib/parse-id";
@@ -12,6 +13,7 @@ export default async function NuovoStockItemPage({
 }) {
   const { productId } = await searchParams;
   const defaultProductId = productId ? (parseId(productId) ?? undefined) : undefined;
+  const t = await getTranslations("DispensaNuovo");
 
   const [products, locations, zones] = await Promise.all([
     prisma.product.findMany({
@@ -28,25 +30,22 @@ export default async function NuovoStockItemPage({
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-xl font-semibold">Aggiungi prodotto in dispensa</h1>
+        <h1 className="text-xl font-semibold">{t("title")}</h1>
         <p className="text-sm text-gray-500 dark:text-gray-400">
-          Non trovi il prodotto?{" "}
+          {t("noProductHint")}{" "}
           <Link href="/prodotti/nuovo" className="text-blue-600 hover:underline dark:text-blue-400">
-            Aggiungilo al catalogo
+            {t("addToCatalogLink")}
           </Link>{" "}
-          o{" "}
+          {t("orText")}{" "}
           <Link href="/dispensa/scansiona" className="text-blue-600 hover:underline dark:text-blue-400">
-            scansiona il codice a barre
+            {t("scanLink")}
           </Link>
           .
         </p>
       </div>
 
       {products.length === 0 || locations.length === 0 ? (
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          Servono almeno un prodotto e un&apos;ubicazione prima di poter aggiungere un elemento in
-          dispensa.
-        </p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">{t("needProductAndLocation")}</p>
       ) : (
         <StockItemForm
           products={products}

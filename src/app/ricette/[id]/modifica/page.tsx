@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { RecipeForm } from "@/components/forms/RecipeForm";
 import { parseId } from "@/lib/parse-id";
@@ -13,19 +14,20 @@ export default async function ModificaRicettaPage({
   const id = parseId((await params).id);
   if (id === null) notFound();
 
-  const [recipe, products] = await Promise.all([
+  const [recipe, products, t] = await Promise.all([
     prisma.recipe.findUnique({
       where: { id },
       include: { ingredients: true },
     }),
     prisma.product.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
+    getTranslations("RicetteModifica"),
   ]);
 
   if (!recipe) notFound();
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-xl font-semibold">Modifica ricetta</h1>
+      <h1 className="text-xl font-semibold">{t("title")}</h1>
       <RecipeForm
         products={products}
         recipeId={recipe.id}

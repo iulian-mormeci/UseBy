@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
 import { submitJson, type FieldErrors } from "@/lib/api-client";
 
@@ -12,6 +13,8 @@ export function CategoryForm({
   initialName?: string;
 }) {
   const router = useRouter();
+  const t = useTranslations("CategoryForm");
+  const tCommon = useTranslations("Common");
   const [formError, setFormError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [submitting, setSubmitting] = useState(false);
@@ -45,7 +48,7 @@ export function CategoryForm({
       {formError && <p className="text-sm text-red-600 dark:text-red-400">{formError}</p>}
 
       <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Nome</span>
+        <span className="text-sm font-medium">{t("nameLabel")}</span>
         <input
           type="text"
           name="name"
@@ -63,7 +66,7 @@ export function CategoryForm({
         disabled={submitting}
         className="rounded-md bg-gray-900 px-4 py-2 font-medium text-white disabled:opacity-50 dark:bg-gray-100 dark:text-gray-900"
       >
-        {submitting ? "Salvataggio..." : categoryId ? "Salva modifiche" : "Aggiungi"}
+        {submitting ? tCommon("saving") : categoryId ? tCommon("saveChanges") : t("add")}
       </button>
     </form>
   );

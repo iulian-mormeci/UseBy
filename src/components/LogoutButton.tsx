@@ -1,10 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 export function LogoutButton({ className }: { className?: string }) {
   const router = useRouter();
+  const t = useTranslations("Nav");
   const [loading, setLoading] = useState(false);
 
   async function handleClick() {
@@ -16,7 +18,7 @@ export function LogoutButton({ className }: { className?: string }) {
 
   return (
     <button type="button" onClick={handleClick} disabled={loading} className={className}>
-      {loading ? "..." : "Esci"}
+      {loading ? "..." : t("logout")}
     </button>
   );
 }

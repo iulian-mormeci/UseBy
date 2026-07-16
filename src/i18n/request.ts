@@ -1,9 +1,16 @@
+import { cookies } from "next/headers";
 import { getRequestConfig } from "next-intl/server";
 
-// Fixed to English for now; phase 3 makes this dynamic (cookie-based
-// preference + a language switcher in the admin panel).
+export const LOCALE_COOKIE_NAME = "useby_locale";
+export const SUPPORTED_LOCALES = ["en", "it"] as const;
+export type Locale = (typeof SUPPORTED_LOCALES)[number];
+export const DEFAULT_LOCALE: Locale = "en";
+
 export default getRequestConfig(async () => {
-  const locale = "en";
+  const cookieValue = (await cookies()).get(LOCALE_COOKIE_NAME)?.value;
+  const locale = (SUPPORTED_LOCALES as readonly string[]).includes(cookieValue ?? "")
+    ? (cookieValue as Locale)
+    : DEFAULT_LOCALE;
 
   return {
     locale,

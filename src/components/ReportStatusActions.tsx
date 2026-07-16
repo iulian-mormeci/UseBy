@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 export function ReportStatusActions({
@@ -11,6 +12,7 @@ export function ReportStatusActions({
   status: string;
 }) {
   const router = useRouter();
+  const t = useTranslations("ReportStatusActions");
   const [loading, setLoading] = useState(false);
 
   async function setStatus(newStatus: "RESOLVED" | "REJECTED") {
@@ -34,7 +36,7 @@ export function ReportStatusActions({
         disabled={loading}
         className="text-sm font-medium text-green-600 hover:underline disabled:opacity-50 dark:text-green-400"
       >
-        Segna risolta
+        {t("markResolved")}
       </button>
       <button
         type="button"
@@ -42,7 +44,7 @@ export function ReportStatusActions({
         disabled={loading}
         className="text-sm font-medium text-gray-500 hover:underline disabled:opacity-50 dark:text-gray-400"
       >
-        Rifiuta
+        {t("reject")}
       </button>
     </div>
   );

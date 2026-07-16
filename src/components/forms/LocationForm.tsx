@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
 import { submitJson, type FieldErrors } from "@/lib/api-client";
 
@@ -12,6 +13,8 @@ export function LocationForm({
   initialData?: { name: string; type: string };
 }) {
   const router = useRouter();
+  const t = useTranslations("LocationForm");
+  const tCommon = useTranslations("Common");
   const [formError, setFormError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [submitting, setSubmitting] = useState(false);
@@ -45,7 +48,7 @@ export function LocationForm({
       {formError && <p className="text-sm text-red-600 dark:text-red-400">{formError}</p>}
 
       <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Nome</span>
+        <span className="text-sm font-medium">{t("nameLabel")}</span>
         <input
           type="text"
           name="name"
@@ -59,15 +62,15 @@ export function LocationForm({
       </label>
 
       <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Tipo</span>
+        <span className="text-sm font-medium">{t("typeLabel")}</span>
         <select
           name="type"
           defaultValue={initialData?.type ?? "PANTRY"}
           className="rounded-md border border-gray-300 px-3 py-2 dark:border-gray-700 dark:bg-gray-900"
         >
-          <option value="PANTRY">Dispensa</option>
-          <option value="FRIDGE">Frigo</option>
-          <option value="FREEZER">Congelatore</option>
+          <option value="PANTRY">{t("type.PANTRY")}</option>
+          <option value="FRIDGE">{t("type.FRIDGE")}</option>
+          <option value="FREEZER">{t("type.FREEZER")}</option>
         </select>
       </label>
 
@@ -76,7 +79,7 @@ export function LocationForm({
         disabled={submitting}
         className="rounded-md bg-gray-900 px-4 py-2 font-medium text-white disabled:opacity-50 dark:bg-gray-100 dark:text-gray-900"
       >
-        {submitting ? "Salvataggio..." : locationId ? "Salva modifiche" : "Aggiungi"}
+        {submitting ? tCommon("saving") : locationId ? tCommon("saveChanges") : t("add")}
       </button>
     </form>
   );

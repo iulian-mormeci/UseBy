@@ -1,4 +1,359 @@
 {
+  "Metadata": {
+    "title": "UseBy",
+    "description": "Pantry, fridge and freezer management"
+  },
+  "Common": {
+    "edit": "Edit",
+    "delete": "Delete",
+    "add": "Add",
+    "save": "Save",
+    "saveChanges": "Save changes",
+    "saving": "Saving...",
+    "filter": "Filter",
+    "reset": "Reset",
+    "optional": "optional"
+  },
+  "Nav": {
+    "dashboard": "Dashboard",
+    "dispensa": "Pantry",
+    "ricette": "Recipes",
+    "prodotti": "Products",
+    "categorie": "Categories",
+    "ubicazioni": "Locations",
+    "segnalazioni": "Reports",
+    "admin": "Admin",
+    "login": "Log in",
+    "logout": "Log out"
+  },
+  "ExpiryBadge": {
+    "noExpiry": "No expiry date",
+    "expiredOn": "Expired on {date}"
+  },
+  "DeleteButton": {
+    "confirmDefault": "Confirm deletion?",
+    "error": "Error while deleting"
+  },
+  "ZoneManager": {
+    "title": "Zones (e.g. top shelf, vegetable drawer)",
+    "noZones": "No zones defined.",
+    "newZoneLabel": "New zone",
+    "confirmDeleteZone": "Delete this zone?",
+    "errorCreating": "Error creating zone"
+  },
+  "ReportStatusActions": {
+    "markResolved": "Mark resolved",
+    "reject": "Reject"
+  },
+  "PendingSubmissionStatusActions": {
+    "markIncluded": "Mark included",
+    "reject": "Reject"
+  },
+  "Dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Status of your pantry, fridge and freezer.",
+    "statTotal": "Items in stock",
+    "statExpired": "Expired",
+    "statExpiring": "Expiring soon",
+    "expiringTitle": "Expiring soon",
+    "addProduct": "+ Add product",
+    "leadDaysHint": "Notice period: {days} days (default), can be overridden per item.",
+    "noExpiringItems": "Nothing expiring at the moment.",
+    "overviewTitle": "Overview by location",
+    "noLocations": "No location has any stock yet.",
+    "noZoneLabel": "No zone"
+  },
+  "Dispensa": {
+    "title": "Pantry",
+    "scanButton": "Scan barcode",
+    "addButton": "+ Add product",
+    "locationLabel": "Location",
+    "allLocations": "All",
+    "statusLabel": "Status",
+    "allStatuses": "All",
+    "statusExpiring": "Expiring soon",
+    "statusExpired": "Expired",
+    "noItemsFound": "No items found.",
+    "colProduct": "Product",
+    "colLocation": "Location",
+    "colZone": "Zone",
+    "colQuantity": "Quantity",
+    "colExpiry": "Expiry",
+    "colActions": "Actions"
+  },
+  "DispensaNuovo": {
+    "title": "Add product to pantry",
+    "noProductHint": "Can't find the product?",
+    "addToCatalogLink": "Add it to the catalog",
+    "orText": "or",
+    "scanLink": "scan the barcode",
+    "needProductAndLocation": "You need at least one product and one location before you can add a pantry item."
+  },
+  "DispensaModifica": {
+    "title": "Edit pantry item"
+  },
+  "DispensaScansiona": {
+    "title": "Scan barcode",
+    "subtitle": "Point the camera at the product's barcode, or enter it manually."
+  },
+  "ScanFlow": {
+    "searchError": "Error while looking up the product",
+    "searching": "Searching...",
+    "retry": "Retry",
+    "alreadyInCatalog": "Already in the catalog",
+    "addToStock": "Add to pantry",
+    "scanAnother": "Scan another code",
+    "foundOnOff": "Found on Open Food Facts. Check the details and save it to the catalog.",
+    "cancelScanAnother": "Cancel and scan another code",
+    "notFoundHint": "Product not found in the catalog or on Open Food Facts. Enter it manually: it will be saved and reported by email for review.",
+    "submittedMessage": "Product \"{name}\" saved and reported for review."
+  },
+  "BarcodeScanner": {
+    "cameraUnavailable": "Camera unavailable",
+    "manualEntryHint": ". You can still enter the barcode manually below.",
+    "manualBarcodeLabel": "Or enter the barcode",
+    "search": "Search"
+  },
+  "StockItemForm": {
+    "initialQuantityLabel": "Initial quantity",
+    "currentQuantityLabel": "Current quantity",
+    "packStateLabel": "Pack status",
+    "productLabel": "Product",
+    "selectProduct": "Select a product",
+    "locationLabel": "Location",
+    "selectLocation": "Select a location",
+    "zoneLabel": "Zone (optional)",
+    "noZone": "No zone",
+    "quantityLabel": "Quantity",
+    "expiryLabel": "Expiry date",
+    "expiryTypeLabel": "Expiry type",
+    "useBy": "Use by",
+    "bestBefore": "Best before",
+    "leadDaysLabel": "Custom notice period (days, optional)",
+    "leadDaysPlaceholder": "Use the global default",
+    "purchasedAtLabel": "Purchased on",
+    "openedAtLabel": "Opened on",
+    "notesLabel": "Notes",
+    "add": "Add"
+  },
+  "RicetteNuova": {
+    "title": "Add recipe",
+    "noIngredientHint": "Can't find an ingredient?",
+    "addToCatalogLink": "Add it to the catalog",
+    "needProduct": "You need at least one catalog product before you can create a recipe."
+  },
+  "RicetteModifica": {
+    "title": "Edit recipe"
+  },
+  "Ricette": {
+    "title": "Recipes",
+    "addButton": "+ Add recipe",
+    "searchTitleLabel": "Search by title",
+    "statusLabel": "Status",
+    "allStatuses": "All",
+    "cookableOnly": "Only cookable now",
+    "stockSearchTitle": "Search recipes using these products from your pantry",
+    "matchAny": "At least one of the selected products",
+    "matchAll": "All of the selected products",
+    "noResults": "No recipes found.",
+    "ingredientsCount": "{count} ingredients",
+    "servingsCount": "{count} servings",
+    "missingIngredients": "Missing: {names}",
+    "expiringIngredients": "Ingredients expiring on {date}",
+    "cookableBadge": "You can cook this",
+    "missingBadgeOne": "1 ingredient missing",
+    "missingBadgeMany": "{count} ingredients missing"
+  },
+  "RicettaDetail": {
+    "cookableMessage": "You can cook this with what's in your pantry",
+    "prepTime": "{minutes} min prep",
+    "cookTime": "{minutes} min cook",
+    "expiringHint": "Uses ingredients expiring on {date}: cook it soon to avoid waste.",
+    "ingredientsTitle": "Ingredients",
+    "requiredAvailable": "needs {required}, {available} available",
+    "available": "available",
+    "notAvailable": "not available",
+    "instructionsTitle": "Instructions",
+    "notesTitle": "Notes"
+  },
+  "RecipeForm": {
+    "titleLabel": "Title",
+    "instructionsLabel": "Instructions",
+    "servingsLabel": "Servings",
+    "prepLabel": "Prep time (min)",
+    "cookLabel": "Cook time (min)",
+    "ingredientsLabel": "Ingredients",
+    "addIngredient": "+ Add ingredient",
+    "selectProduct": "Select a product",
+    "quantityPlaceholder": "Quantity",
+    "optionalLabel": "Optional",
+    "remove": "Remove",
+    "notesLabel": "Notes",
+    "create": "Create recipe"
+  },
+  "Prodotti": {
+    "title": "Products",
+    "addButton": "+ Add product",
+    "noProductHint": "Can't find a product?",
+    "reportLink": "Report it",
+    "searchLabel": "Search",
+    "categoryLabel": "Category",
+    "allCategories": "All",
+    "noProductsFound": "No products found.",
+    "colName": "Name",
+    "colCategory": "Category",
+    "colUnit": "Unit",
+    "colInStock": "In pantry",
+    "colActions": "Actions"
+  },
+  "ProdottiNuovo": {
+    "title": "Add product"
+  },
+  "ProdottiModifica": {
+    "title": "Edit product"
+  },
+  "ProductForm": {
+    "nameLabel": "Name",
+    "brandLabel": "Brand (optional)",
+    "categoryLabel": "Category",
+    "noCategory": "No category",
+    "unitLabel": "Unit of measure",
+    "unit": {
+      "PIECE": "Piece",
+      "GRAM": "Grams",
+      "KILOGRAM": "Kilograms",
+      "MILLILITER": "Milliliters",
+      "LITER": "Liters"
+    },
+    "barcodeLabel": "Barcode",
+    "barcodeOptionalLabel": "Barcode (optional)",
+    "shelfLifeLabel": "Typical shelf life (days, optional)",
+    "storageHintLabel": "Storage hint (optional)",
+    "imageLabel": "Image (optional)",
+    "uploading": "Uploading...",
+    "uploadError": "Error while uploading the image",
+    "imagePreviewAlt": "Product preview",
+    "add": "Add"
+  },
+  "Categorie": {
+    "title": "Categories",
+    "addButton": "+ Add category",
+    "noCategoriesFound": "No categories yet.",
+    "colName": "Name",
+    "colProducts": "Products",
+    "colActions": "Actions"
+  },
+  "CategorieNuova": {
+    "title": "Add category"
+  },
+  "CategorieModifica": {
+    "title": "Edit category"
+  },
+  "CategoryForm": {
+    "nameLabel": "Name",
+    "add": "Add"
+  },
+  "Ubicazioni": {
+    "title": "Locations",
+    "addButton": "+ Add location",
+    "noLocationsFound": "No locations yet.",
+    "colName": "Name",
+    "colType": "Type",
+    "colProducts": "Products",
+    "colActions": "Actions"
+  },
+  "UbicazioniNuova": {
+    "title": "Add location"
+  },
+  "UbicazioniModifica": {
+    "title": "Edit location"
+  },
+  "LocationForm": {
+    "nameLabel": "Name",
+    "typeLabel": "Type",
+    "type": {
+      "PANTRY": "Pantry",
+      "FRIDGE": "Fridge",
+      "FREEZER": "Freezer"
+    },
+    "add": "Add"
+  },
+  "LocationType": {
+    "PANTRY": "Pantry",
+    "FRIDGE": "Fridge",
+    "FREEZER": "Freezer"
+  },
+  "Segnalazioni": {
+    "title": "Missing product reports",
+    "addButton": "+ Report product",
+    "statusLabel": "Status",
+    "allStatuses": "All",
+    "statusPending": "Pending",
+    "statusResolved": "Resolved",
+    "statusRejected": "Rejected",
+    "noReportsFound": "No reports found.",
+    "colProduct": "Requested product",
+    "colNote": "Note",
+    "colStatus": "Status",
+    "colEmail": "Email",
+    "colActions": "Actions",
+    "emailSent": "Sent",
+    "emailNotSent": "Not sent"
+  },
+  "SegnalazioniNuova": {
+    "title": "Report a missing product",
+    "subtitle": "Can't find a product in the catalog? Report it: we'll get an email notification."
+  },
+  "MissingProductReportForm": {
+    "nameLabel": "Product name",
+    "noteLabel": "Notes (optional)",
+    "send": "Send report",
+    "sending": "Sending...",
+    "thankYou": "Thanks, the report has been sent."
+  },
+  "Admin": {
+    "title": "Admin panel",
+    "linkProductsHint": "Edit and delete catalog entries",
+    "linkCategoriesHint": "Add, edit, delete",
+    "linkLocationsHint": "Add, edit, delete",
+    "linkRecipesHint": "Add, edit, delete",
+    "linkReportsHint": "Manage status",
+    "linkPending": "Products to review",
+    "linkPendingHint": "{count} pending",
+    "linkSettings": "Settings",
+    "linkSettingsHint": "Default expiry notice"
+  },
+  "AdminPendingSubmissions": {
+    "title": "Products to review",
+    "subtitle": "Products created from a barcode not found in the catalog or on Open Food Facts.",
+    "statusLabel": "Status",
+    "allStatuses": "All",
+    "statusPending": "Pending",
+    "statusEmailed": "Email sent",
+    "statusIncluded": "Included",
+    "statusRejected": "Rejected",
+    "noneFound": "No reports found.",
+    "colProduct": "Product",
+    "colBarcode": "Barcode",
+    "colStatus": "Status",
+    "colActions": "Actions"
+  },
+  "Login": {
+    "title": "Log in",
+    "usernameLabel": "Username",
+    "passwordLabel": "Password",
+    "submit": "Log in",
+    "submitting": "Logging in...",
+    "invalidCredentials": "Invalid credentials"
+  },
+  "Settings": {
+    "title": "Settings",
+    "leadDaysHint": "Number of days before a product's expiry date after which it shows up as \"expiring soon\". Can be overridden per pantry item.",
+    "leadDaysLabel": "Default expiry notice (days)",
+    "saved": "Settings saved.",
+    "languageSectionTitle": "Language",
+    "languageLabel": "Interface language"
+  },
   "Product": {
     "usageTypeLabel": "Usage type",
     "usageType": {
@@ -8,11 +363,6 @@
       "VOLUME": "Volume"
     },
     "defaultUnitLabel": "Default unit"
-  },
-  "StockItemForm": {
-    "initialQuantityLabel": "Initial quantity",
-    "currentQuantityLabel": "Current quantity",
-    "packStateLabel": "Pack status"
   },
   "QuantityIndicator": {
     "piecesRemaining": "{current} / {initial} pcs",

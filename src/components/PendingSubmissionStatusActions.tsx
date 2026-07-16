@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 export function PendingSubmissionStatusActions({
@@ -11,6 +12,7 @@ export function PendingSubmissionStatusActions({
   status: string;
 }) {
   const router = useRouter();
+  const t = useTranslations("PendingSubmissionStatusActions");
   const [loading, setLoading] = useState(false);
 
   async function setStatus(newStatus: "INCLUDED" | "REJECTED") {
@@ -34,7 +36,7 @@ export function PendingSubmissionStatusActions({
         disabled={loading}
         className="text-sm font-medium text-green-600 hover:underline disabled:opacity-50 dark:text-green-400"
       >
-        Segna inclusa
+        {t("markIncluded")}
       </button>
       <button
         type="button"
@@ -42,7 +44,7 @@ export function PendingSubmissionStatusActions({
         disabled={loading}
         className="text-sm font-medium text-gray-500 hover:underline disabled:opacity-50 dark:text-gray-400"
       >
-        Rifiuta
+        {t("reject")}
       </button>
     </div>
   );

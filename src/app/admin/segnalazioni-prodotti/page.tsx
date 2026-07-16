@@ -1,17 +1,11 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { DeleteButton } from "@/components/DeleteButton";
 import { PendingSubmissionStatusActions } from "@/components/PendingSubmissionStatusActions";
 import { pendingProductSubmissionStatusSchema } from "@/lib/validation/pending-product-submission";
 
 export const dynamic = "force-dynamic";
-
-const STATUS_LABELS: Record<string, string> = {
-  PENDING: "In attesa",
-  EMAILED: "Email inviata",
-  INCLUDED: "Inclusa",
-  REJECTED: "Rifiutata",
-};
 
 const STATUS_STYLES: Record<string, string> = {
   PENDING: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
@@ -27,6 +21,17 @@ export default async function SegnalazioniProdottiPage({
 }) {
   const { status } = await searchParams;
   const statusResult = status ? pendingProductSubmissionStatusSchema.safeParse(status) : null;
+  const [t, tCommon] = await Promise.all([
+    getTranslations("AdminPendingSubmissions"),
+    getTranslations("Common"),
+  ]);
+
+  const statusLabels: Record<string, string> = {
+    PENDING: t("statusPending"),
+    EMAILED: t("statusEmailed"),
+    INCLUDED: t("statusIncluded"),
+    REJECTED: t("statusRejected"),
+  };
 
   const submissions = await prisma.pendingProductSubmission.findMany({
     where: statusResult?.success ? { status: statusResult.data } : undefined,
@@ -37,49 +42,50 @@ export default async function SegnalazioniProdottiPage({
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-xl font-semibold">Prodotti da revisionare</h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          Prodotti creati da un codice a barre non trovato né a catalogo né su Open Food Facts.
-        </p>
+        <h1 className="text-xl font-semibold">{t("title")}</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400">{t("subtitle")}</p>
       </div>
 
       <form method="get" className="flex flex-wrap items-end gap-3">
         <label className="flex flex-col gap-1">
-          <span className="text-sm font-medium">Stato</span>
+          <span className="text-sm font-medium">{t("statusLabel")}</span>
           <select
             name="status"
             defaultValue={status ?? ""}
             className="rounded-md border border-gray-300 px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-900"
           >
-            <option value="">Tutte</option>
-            <option value="PENDING">In attesa</option>
-            <option value="EMAILED">Email inviata</option>
-            <option value="INCLUDED">Incluse</option>
-            <option value="REJECTED">Rifiutate</option>
+            <option value="">{t("allStatuses")}</option>
+            <option value="PENDING">{t("statusPending")}</option>
+            <option value="EMAILED">{t("statusEmailed")}</option>
+            <option value="INCLUDED">{t("statusIncluded")}</option>
+            <option value="REJECTED">{t("statusRejected")}</option>
           </select>
         </label>
         <button
           type="submit"
           className="rounded-md border border-gray-300 px-3 py-2 text-sm font-medium dark:border-gray-700"
         >
-          Filtra
+          {tCommon("filter")}
         </button>
-        <Link href="/admin/segnalazioni-prodotti" className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
-          Reimposta
+        <Link
+          href="/admin/segnalazioni-prodotti"
+          className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400"
+        >
+          {tCommon("reset")}
         </Link>
       </form>
 
       {submissions.length === 0 ? (
-        <p className="text-sm text-gray-500 dark:text-gray-400">Nessuna segnalazione trovata.</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">{t("noneFound")}</p>
       ) : (
         <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-800">
           <table className="w-full text-left text-sm">
             <thead className="border-b border-gray-200 text-gray-500 dark:border-gray-800 dark:text-gray-400">
               <tr>
-                <th className="px-3 py-2 font-medium">Prodotto</th>
-                <th className="px-3 py-2 font-medium">Codice a barre</th>
-                <th className="px-3 py-2 font-medium">Stato</th>
-                <th className="px-3 py-2 font-medium">Azioni</th>
+                <th className="px-3 py-2 font-medium">{t("colProduct")}</th>
+                <th className="px-3 py-2 font-medium">{t("colBarcode")}</th>
+                <th className="px-3 py-2 font-medium">{t("colStatus")}</th>
+                <th className="px-3 py-2 font-medium">{t("colActions")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
@@ -103,7 +109,7 @@ export default async function SegnalazioniProdottiPage({
                     <span
                       className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_STYLES[submission.status]}`}
                     >
-                      {STATUS_LABELS[submission.status]}
+                      {statusLabels[submission.status]}
                     </span>
                   </td>
                   <td className="px-3 py-2">

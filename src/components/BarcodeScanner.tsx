@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 
 type DetectedBarcode = { rawValue: string };
@@ -11,6 +12,7 @@ type BarcodeDetectorConstructor = new (options: {
 }) => BarcodeDetectorLike;
 
 export function BarcodeScanner({ onDetected }: { onDetected: (barcode: string) => void }) {
+  const t = useTranslations("BarcodeScanner");
   const videoRef = useRef<HTMLVideoElement>(null);
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [manualBarcode, setManualBarcode] = useState("");
@@ -93,11 +95,8 @@ export function BarcodeScanner({ onDetected }: { onDetected: (barcode: string) =
           await startZxingFallback(video);
         }
       } catch (error) {
-        setCameraError(
-          error instanceof Error
-            ? `Fotocamera non disponibile: ${error.message}`
-            : "Fotocamera non disponibile",
-        );
+        const base = t("cameraUnavailable");
+        setCameraError(error instanceof Error ? `${base}: ${error.message}` : base);
       }
     }
 
@@ -107,7 +106,7 @@ export function BarcodeScanner({ onDetected }: { onDetected: (barcode: string) =
       stopped = true;
       stopFn?.();
     };
-  }, [onDetected]);
+  }, [onDetected, t]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -117,7 +116,8 @@ export function BarcodeScanner({ onDetected }: { onDetected: (barcode: string) =
 
       {cameraError && (
         <p className="text-sm text-red-600 dark:text-red-400">
-          {cameraError}. Puoi comunque inserire il codice a barre manualmente qui sotto.
+          {cameraError}
+          {t("manualEntryHint")}
         </p>
       )}
 
@@ -129,7 +129,7 @@ export function BarcodeScanner({ onDetected }: { onDetected: (barcode: string) =
         className="flex items-end gap-2"
       >
         <label className="flex flex-1 flex-col gap-1">
-          <span className="text-sm font-medium">Oppure inserisci il codice a barre</span>
+          <span className="text-sm font-medium">{t("manualBarcodeLabel")}</span>
           <input
             type="text"
             value={manualBarcode}
@@ -141,7 +141,7 @@ export function BarcodeScanner({ onDetected }: { onDetected: (barcode: string) =
           type="submit"
           className="rounded-md border border-gray-300 px-3 py-2 text-sm font-medium dark:border-gray-700"
         >
-          Cerca
+          {t("search")}
         </button>
       </form>
     </div>

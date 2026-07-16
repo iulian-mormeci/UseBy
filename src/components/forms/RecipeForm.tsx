@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
 import { submitJson, type FieldErrors } from "@/lib/api-client";
 
@@ -36,6 +37,8 @@ export function RecipeForm({
   initialData?: InitialData;
 }) {
   const router = useRouter();
+  const t = useTranslations("RecipeForm");
+  const tCommon = useTranslations("Common");
   const [rows, setRows] = useState<IngredientRow[]>(
     initialData
       ? initialData.ingredients.map((i) => ({
@@ -109,7 +112,7 @@ export function RecipeForm({
       {formError && <p className="text-sm text-red-600 dark:text-red-400">{formError}</p>}
 
       <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Titolo</span>
+        <span className="text-sm font-medium">{t("titleLabel")}</span>
         <input
           type="text"
           name="title"
@@ -123,7 +126,7 @@ export function RecipeForm({
       </label>
 
       <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Istruzioni</span>
+        <span className="text-sm font-medium">{t("instructionsLabel")}</span>
         <textarea
           name="instructions"
           rows={5}
@@ -140,7 +143,7 @@ export function RecipeForm({
 
       <div className="flex gap-4">
         <label className="flex flex-1 flex-col gap-1">
-          <span className="text-sm font-medium">Porzioni</span>
+          <span className="text-sm font-medium">{t("servingsLabel")}</span>
           <input
             type="number"
             name="servings"
@@ -150,7 +153,7 @@ export function RecipeForm({
           />
         </label>
         <label className="flex flex-1 flex-col gap-1">
-          <span className="text-sm font-medium">Preparazione (min)</span>
+          <span className="text-sm font-medium">{t("prepLabel")}</span>
           <input
             type="number"
             name="prepMinutes"
@@ -160,7 +163,7 @@ export function RecipeForm({
           />
         </label>
         <label className="flex flex-1 flex-col gap-1">
-          <span className="text-sm font-medium">Cottura (min)</span>
+          <span className="text-sm font-medium">{t("cookLabel")}</span>
           <input
             type="number"
             name="cookMinutes"
@@ -173,13 +176,13 @@ export function RecipeForm({
 
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
-          <span className="text-sm font-medium">Ingredienti</span>
+          <span className="text-sm font-medium">{t("ingredientsLabel")}</span>
           <button
             type="button"
             onClick={addRow}
             className="text-sm font-medium text-blue-600 hover:underline dark:text-blue-400"
           >
-            + Aggiungi ingrediente
+            {t("addIngredient")}
           </button>
         </div>
 
@@ -194,7 +197,7 @@ export function RecipeForm({
               onChange={(e) => updateRow(index, { productId: e.target.value })}
               className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-900"
             >
-              <option value="">Seleziona un prodotto</option>
+              <option value="">{t("selectProduct")}</option>
               {products.map((product) => (
                 <option key={product.id} value={product.id}>
                   {product.name}
@@ -205,7 +208,7 @@ export function RecipeForm({
               type="number"
               step="0.01"
               min="0"
-              placeholder="Quantità"
+              placeholder={t("quantityPlaceholder")}
               value={row.quantity}
               onChange={(e) => updateRow(index, { quantity: e.target.value })}
               className="w-28 rounded-md border border-gray-300 px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-900"
@@ -216,7 +219,7 @@ export function RecipeForm({
                 checked={row.optional}
                 onChange={(e) => updateRow(index, { optional: e.target.checked })}
               />
-              Opzionale
+              {t("optionalLabel")}
             </label>
             <button
               type="button"
@@ -224,14 +227,14 @@ export function RecipeForm({
               disabled={rows.length === 1}
               className="text-sm font-medium text-red-600 disabled:opacity-40 dark:text-red-400"
             >
-              Rimuovi
+              {t("remove")}
             </button>
           </div>
         ))}
       </div>
 
       <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Note</span>
+        <span className="text-sm font-medium">{t("notesLabel")}</span>
         <textarea
           name="notes"
           rows={3}
@@ -245,7 +248,7 @@ export function RecipeForm({
         disabled={submitting}
         className="rounded-md bg-gray-900 px-4 py-2 font-medium text-white disabled:opacity-50 dark:bg-gray-100 dark:text-gray-900"
       >
-        {submitting ? "Salvataggio..." : recipeId ? "Salva modifiche" : "Crea ricetta"}
+        {submitting ? tCommon("saving") : recipeId ? tCommon("saveChanges") : t("create")}
       </button>
     </form>
   );

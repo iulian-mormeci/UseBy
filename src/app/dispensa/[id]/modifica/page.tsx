@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { StockItemForm } from "@/components/forms/StockItemForm";
 import { parseId } from "@/lib/parse-id";
@@ -12,6 +13,8 @@ export default async function ModificaStockItemPage({
 }) {
   const id = parseId((await params).id);
   if (id === null) notFound();
+
+  const t = await getTranslations("DispensaModifica");
 
   const [stockItem, products, locations, zones] = await Promise.all([
     prisma.stockItem.findUnique({ where: { id } }),
@@ -30,7 +33,7 @@ export default async function ModificaStockItemPage({
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-xl font-semibold">Modifica prodotto in dispensa</h1>
+      <h1 className="text-xl font-semibold">{t("title")}</h1>
       <StockItemForm
         products={products}
         locations={locations}

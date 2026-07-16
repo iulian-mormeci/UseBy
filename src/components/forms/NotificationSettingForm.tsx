@@ -1,9 +1,12 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
 import { submitJson, type FieldErrors } from "@/lib/api-client";
 
 export function NotificationSettingForm({ defaultLeadDays }: { defaultLeadDays: number }) {
+  const t = useTranslations("Settings");
+  const tCommon = useTranslations("Common");
   const [formError, setFormError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [submitting, setSubmitting] = useState(false);
@@ -35,10 +38,10 @@ export function NotificationSettingForm({ defaultLeadDays }: { defaultLeadDays: 
   return (
     <form onSubmit={handleSubmit} className="flex max-w-sm flex-col gap-4">
       {formError && <p className="text-sm text-red-600 dark:text-red-400">{formError}</p>}
-      {saved && <p className="text-sm text-green-700 dark:text-green-400">Impostazioni salvate.</p>}
+      {saved && <p className="text-sm text-green-700 dark:text-green-400">{t("saved")}</p>}
 
       <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Preavviso scadenza di default (giorni)</span>
+        <span className="text-sm font-medium">{t("leadDaysLabel")}</span>
         <input
           type="number"
           name="defaultLeadDays"
@@ -59,7 +62,7 @@ export function NotificationSettingForm({ defaultLeadDays }: { defaultLeadDays: 
         disabled={submitting}
         className="w-fit rounded-md bg-gray-900 px-4 py-2 font-medium text-white disabled:opacity-50 dark:bg-gray-100 dark:text-gray-900"
       >
-        {submitting ? "Salvataggio..." : "Salva"}
+        {submitting ? tCommon("saving") : tCommon("save")}
       </button>
     </form>
   );

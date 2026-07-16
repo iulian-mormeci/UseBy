@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import {
   getStockQuantityByProduct,
@@ -29,26 +30,29 @@ export default async function RicettePage({
   const selectedProductIds = toArray(productIdsRaw).map(Number);
   const isExactMatch = matchMode === "all";
 
-  const [recipes, stockByProduct, expiryByProduct, stockedProducts, admin] = await Promise.all([
-    prisma.recipe.findMany({
-      where: {
-        ...(q ? { title: { contains: q, mode: "insensitive" } } : {}),
-        ...(selectedProductIds.length > 0
-          ? { ingredients: { some: { productId: { in: selectedProductIds } } } }
-          : {}),
-      },
-      orderBy: { title: "asc" },
-      include: { ingredients: { include: { product: true } } },
-    }),
-    getStockQuantityByProduct(),
-    getEarliestExpiryByProduct(),
-    prisma.product.findMany({
-      where: { stockItems: { some: {} } },
-      orderBy: { name: "asc" },
-      select: { id: true, name: true },
-    }),
-    isAdmin(),
-  ]);
+  const [recipes, stockByProduct, expiryByProduct, stockedProducts, admin, t, tCommon] =
+    await Promise.all([
+      prisma.recipe.findMany({
+        where: {
+          ...(q ? { title: { contains: q, mode: "insensitive" } } : {}),
+          ...(selectedProductIds.length > 0
+            ? { ingredients: { some: { productId: { in: selectedProductIds } } } }
+            : {}),
+        },
+        orderBy: { title: "asc" },
+        include: { ingredients: { include: { product: true } } },
+      }),
+      getStockQuantityByProduct(),
+      getEarliestExpiryByProduct(),
+      prisma.product.findMany({
+        where: { stockItems: { some: {} } },
+        orderBy: { name: "asc" },
+        select: { id: true, name: true },
+      }),
+      isAdmin(),
+      getTranslations("Ricette"),
+      getTranslations("Common"),
+    ]);
 
   const recipesMatchingSelection =
     selectedProductIds.length > 0 && isExactMatch
@@ -70,13 +74,13 @@ export default async function RicettePage({
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Ricette</h1>
+        <h1 className="text-xl font-semibold">{t("title")}</h1>
         {admin && (
           <Link
             href="/ricette/nuovo"
             className="rounded-md bg-gray-900 px-3 py-1.5 text-sm font-medium text-white dark:bg-gray-100 dark:text-gray-900"
           >
-            + Aggiungi ricetta
+            {t("addButton")}
           </Link>
         )}
       </div>
@@ -84,7 +88,7 @@ export default async function RicettePage({
       <form method="get" className="flex flex-col gap-4">
         <div className="flex flex-wrap items-end gap-3">
           <label className="flex flex-col gap-1">
-            <span className="text-sm font-medium">Cerca per titolo</span>
+            <span className="text-sm font-medium">{t("searchTitleLabel")}</span>
             <input
               type="text"
               name="q"
@@ -94,14 +98,14 @@ export default async function RicettePage({
           </label>
 
           <label className="flex flex-col gap-1">
-            <span className="text-sm font-medium">Stato</span>
+            <span className="text-sm font-medium">{t("statusLabel")}</span>
             <select
               name="stato"
               defaultValue={stato ?? ""}
               className="rounded-md border border-gray-300 px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-900"
             >
-              <option value="">Tutte</option>
-              <option value="cucinabili">Solo cucinabili ora</option>
+              <option value="">{t("allStatuses")}</option>
+              <option value="cucinabili">{t("cookableOnly")}</option>
             </select>
           </label>
 
@@ -109,18 +113,16 @@ export default async function RicettePage({
             type="submit"
             className="rounded-md border border-gray-300 px-3 py-2 text-sm font-medium dark:border-gray-700"
           >
-            Filtra
+            {tCommon("filter")}
           </button>
           <Link href="/ricette" className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
-            Reimposta
+            {tCommon("reset")}
           </Link>
         </div>
 
         {stockedProducts.length > 0 && (
           <div className="flex flex-col gap-2 rounded-lg border border-gray-200 p-3 dark:border-gray-800">
-            <span className="text-sm font-medium">
-              Cerca ricette che usano questi prodotti dalla tua dispensa
-            </span>
+            <span className="text-sm font-medium">{t("stockSearchTitle")}</span>
             <div className="flex flex-wrap gap-x-4 gap-y-2">
               {stockedProducts.map((product) => (
                 <label key={product.id} className="flex items-center gap-1.5 text-sm">
@@ -142,11 +144,11 @@ export default async function RicettePage({
                   value="any"
                   defaultChecked={matchMode !== "all"}
                 />
-                Almeno uno dei prodotti selezionati
+                {t("matchAny")}
               </label>
               <label className="flex items-center gap-1.5">
                 <input type="radio" name="matchMode" value="all" defaultChecked={matchMode === "all"} />
-                Tutti i prodotti selezionati
+                {t("matchAll")}
               </label>
             </div>
           </div>
@@ -154,7 +156,7 @@ export default async function RicettePage({
       </form>
 
       {results.length === 0 ? (
-        <p className="text-sm text-gray-500 dark:text-gray-400">Nessuna ricetta trovata.</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">{t("noResults")}</p>
       ) : (
         <ul className="divide-y divide-gray-200 rounded-lg border border-gray-200 dark:divide-gray-800 dark:border-gray-800">
           {results.map(({ recipe, cookability }) => (
@@ -164,30 +166,31 @@ export default async function RicettePage({
                   {recipe.title}
                 </Link>
                 <div className="text-sm text-gray-500 dark:text-gray-400">
-                  {recipe.ingredients.length} ingredienti
-                  {recipe.servings ? ` · ${recipe.servings} porzioni` : ""}
+                  {t("ingredientsCount", { count: recipe.ingredients.length })}
+                  {recipe.servings ? ` · ${t("servingsCount", { count: recipe.servings })}` : ""}
                 </div>
                 {cookability.missingIngredientNames.length > 0 && (
                   <div className="text-sm text-red-600 dark:text-red-400">
-                    Manca: {cookability.missingIngredientNames.join(", ")}
+                    {t("missingIngredients", { names: cookability.missingIngredientNames.join(", ") })}
                   </div>
                 )}
                 {cookability.soonestExpiryDate && (
                   <div className="text-sm text-amber-600 dark:text-amber-400">
-                    Ingredienti in scadenza il{" "}
-                    {cookability.soonestExpiryDate.toLocaleDateString("it-IT")}
+                    {t("expiringIngredients", {
+                      date: cookability.soonestExpiryDate.toLocaleDateString(),
+                    })}
                   </div>
                 )}
               </div>
               {cookability.isCookable ? (
                 <span className="shrink-0 inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-200">
-                  Puoi cucinarla
+                  {t("cookableBadge")}
                 </span>
               ) : (
                 <span className="shrink-0 inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800 dark:bg-red-900 dark:text-red-200">
                   {cookability.missingCount === 1
-                    ? "Manca 1 ingrediente"
-                    : `Mancano ${cookability.missingCount} ingredienti`}
+                    ? t("missingBadgeOne")
+                    : t("missingBadgeMany", { count: cookability.missingCount })}
                 </span>
               )}
             </li>

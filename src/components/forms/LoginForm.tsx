@@ -1,10 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
 
 export function LoginForm({ next }: { next: string }) {
   const router = useRouter();
+  const t = useTranslations("Login");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -25,7 +27,7 @@ export function LoginForm({ next }: { next: string }) {
 
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
-      setError(body.error ?? "Credenziali non valide");
+      setError(body.error ?? t("invalidCredentials"));
       setSubmitting(false);
       return;
     }
@@ -39,7 +41,7 @@ export function LoginForm({ next }: { next: string }) {
       {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
 
       <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Nome utente</span>
+        <span className="text-sm font-medium">{t("usernameLabel")}</span>
         <input
           type="text"
           name="username"
@@ -50,7 +52,7 @@ export function LoginForm({ next }: { next: string }) {
       </label>
 
       <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Password</span>
+        <span className="text-sm font-medium">{t("passwordLabel")}</span>
         <input
           type="password"
           name="password"
@@ -64,7 +66,7 @@ export function LoginForm({ next }: { next: string }) {
         disabled={submitting}
         className="rounded-md bg-gray-900 px-4 py-2 font-medium text-white disabled:opacity-50 dark:bg-gray-100 dark:text-gray-900"
       >
-        {submitting ? "Accesso..." : "Accedi"}
+        {submitting ? t("submitting") : t("submit")}
       </button>
     </form>
   );

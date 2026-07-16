@@ -40,6 +40,7 @@ const ADMIN_RULES: Rule[] = [
   { method: "PATCH", path: /^\/api\/pending-product-submissions\/[^/]+$/ },
   { method: "DELETE", path: /^\/api\/pending-product-submissions\/[^/]+$/ },
   { method: "PATCH", path: /^\/api\/notification-settings$/ },
+  { method: "POST", path: /^\/api\/locale$/ },
 ];
 
 function matchesRule(method: string, path: string): boolean {
