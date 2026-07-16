@@ -1,31 +1,32 @@
 # UseBy
 
-Servizio self-hosted per la gestione di dispensa, frigo e congelatore: tracciamento
-prodotti e scadenze, ricerca ricette in base a quello che hai in casa, segnalazione
-via email dei prodotti mancanti a catalogo.
+Self-hosted service for managing your pantry, fridge and freezer: tracking
+products and expiry dates, finding recipes based on what you already have at
+home, and reporting missing products by email.
 
-Tutta la logica (matching prodotti, ricerca ricette) è basata su query al database
-e regole esplicite: nessuna integrazione con modelli AI/LLM in nessuna parte del
-progetto.
+All the logic (product matching, recipe search) is based on database queries
+and explicit rules — there is no AI/LLM integration anywhere in the project.
 
 ## Stack
 
 - [Next.js 15](https://nextjs.org/) (TypeScript, App Router)
 - [Prisma ORM](https://www.prisma.io/) + PostgreSQL
-- Docker Compose per il deploy (container `app`, `db`, `mailhog` in dev)
+- Docker Compose for deployment (`app`, `db`, `mailhog` in dev)
+- [next-intl](https://next-intl.dev/) for the UI (English by default, Italian
+  available from the admin panel)
 
-## Sviluppo locale
+## Local development
 
-Requisiti: Node.js 22+, Docker.
+Requirements: Node.js 22+, Docker.
 
 ```bash
-cp .env.example .env   # se non già presente
+cp .env.example .env   # if not already present
 npm install
 
-# avvia solo db + mailhog in Docker
+# start only db + mailhog in Docker
 docker compose --profile dev up -d db mailhog
 
-# applica lo schema al database e genera il client Prisma
+# apply the schema to the database and generate the Prisma client
 npm run prisma:migrate:dev
 npm run prisma:generate
 
@@ -33,57 +34,82 @@ npm run dev
 ```
 
 - App: http://localhost:3000
-- Mailhog (catcher email di sviluppo): http://localhost:8025
+- Mailhog (dev email catcher): http://localhost:8025
 
-## Deploy con Docker Compose
-
-Stack completo (app + db), con Mailhog opzionale via profilo `dev`:
+### Prisma migrations
 
 ```bash
-# produzione: senza mailhog, SMTP reale configurato in .env
+npm run prisma:migrate:dev      # create/apply a migration while developing
+npm run prisma:generate         # regenerate the Prisma client after schema changes
+npm run prisma:migrate:deploy   # apply pending migrations (used automatically on container start)
+```
+
+## Deploying with Docker Compose
+
+Full stack (app + db), with Mailhog available as an optional profile:
+
+```bash
+# production: no mailhog, real SMTP relay configured in .env
 docker compose up -d --build
 
-# sviluppo/staging: con mailhog incluso
+# dev/staging: with mailhog included
 docker compose --profile dev up -d --build
 ```
 
-Al primo avvio il container `app` esegue automaticamente `prisma migrate deploy`
-prima di partire (vedi `docker-entrypoint.sh`).
+On startup, the `app` container automatically runs `prisma migrate deploy`
+before starting (see `docker-entrypoint.sh`).
 
-## Variabili d'ambiente
+## Environment variables
 
-Vedi `.env.example` per l'elenco completo (credenziali Postgres, `DATABASE_URL`,
-porta dell'app, configurazione SMTP per le email di segnalazione prodotti mancanti,
-`REPORT_EMAIL_TO` come destinatario di quelle email).
-In produzione, valorizzare `SMTP_HOST`/`SMTP_PORT`/`SMTP_USER`/`SMTP_PASSWORD` con
-un relay SMTP reale e omettere il profilo `dev` (Mailhog) in fase di avvio.
+See `.env.example` for the full list (Postgres credentials, `DATABASE_URL`,
+the app's port, SMTP configuration for missing-product report emails,
+`REPORT_EMAIL_TO` as the recipient of those emails).
+In production, set `SMTP_HOST`/`SMTP_PORT`/`SMTP_USER`/`SMTP_PASSWORD` to a
+real SMTP relay and skip the `dev` profile when starting the stack.
 
-`SMTP_HOST` dipende da come stai eseguendo l'app: `localhost` per `npm run dev`
-sull'host (Mailhog pubblica la porta 1025), `mailhog` se usi il profilo `dev` di
-docker-compose (rete interna dei container), il relay reale in produzione.
+`SMTP_HOST` depends on how you're running the app: `localhost` for
+`npm run dev` on the host (Mailhog publishes port 1025), `mailhog` if you use
+docker-compose's `dev` profile (containers' internal network), the real
+relay's hostname in production.
 
-## Pannello Admin
+## Admin panel
 
-Dashboard, dispensa, ricette, scansione barcode e segnalazione prodotti mancanti
-restano liberamente accessibili (pensati per l'uso quotidiano di tutta la
-famiglia). Un login protegge invece la gestione di catalogo/ricette/ubicazioni,
-la revisione dei prodotti scansionati ma non trovati altrove, e la
-configurazione del preavviso scadenze di default.
+The dashboard, pantry, recipes, barcode scanning and missing-product
+reporting stay open to everyone (meant for everyday use by the whole
+household). A login instead protects catalog/recipe/location management,
+reviewing products scanned but not found elsewhere, and the default
+expiry-notice configuration.
 
-Per abilitarlo, in `.env`:
+To enable it, in `.env`:
 
 ```bash
 ADMIN_USERNAME=admin
-ADMIN_PASSWORD_HASH_BASE64=  # vedi comando sotto
+ADMIN_PASSWORD_HASH_BASE64=  # see the command below
 SESSION_SECRET=$(openssl rand -hex 32)
 ```
 
-Genera l'hash della password (il base64 evita che i `$` dell'hash bcrypt
-vengano interpretati come variabili da docker-compose):
+Generate the password hash (base64-encoded so the `$` characters in a bcrypt
+hash don't get mangled by docker-compose's variable interpolation):
 
 ```bash
-node -e "console.log(Buffer.from(require('bcryptjs').hashSync(process.argv[1], 10)).toString('base64'))" "la-tua-password"
+node -e "console.log(Buffer.from(require('bcryptjs').hashSync(process.argv[1], 10)).toString('base64'))" "your-password"
 ```
 
-Accedi da `/login`; il pannello è raggiungibile da `/admin` (link "Admin" in
-navbar quando autenticato).
+Log in at `/login`; the panel is reachable from `/admin` (an "Admin" link
+appears in the navbar once authenticated).
+
+## Tracking how much of a product is left
+
+Each product has a `usageType` (Pack, Weight, Quantity or Volume) that
+determines how its remaining amount is tracked and displayed: a continuous
+level gauge for Weight/Volume, a pieces-remaining counter for Quantity, and a
+Full/Partial/Nearly empty/Empty step selector for Pack items. This shows up
+as an overlay on the product's image on the dashboard.
+
+## Language
+
+The interface defaults to English; a language selector under
+`/admin/impostazioni` switches to Italian (persisted in a cookie, since this
+is a single-admin app with no user accounts). This only affects the UI —
+this README and any other project documentation stay in English regardless
+of the selected interface language.
